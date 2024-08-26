@@ -7,6 +7,10 @@ tasks:
     cmds:
       - cd cmd/auth && go run main.go
 
+  location_ingestion:
+    cmds:
+      - cd cmd/location_ingestion && go run main.go
+
   migrate:
     desc: migrate db
     cmds:
