@@ -105,3 +105,29 @@ services:
     image: redis:7.2-alpine
     ports:
       - '16379:6379'
+
+  traefik:
+    image: 'traefik:v3.0'
+    command:
+      # - '--log.level=DEBUG'
+      - '--api.insecure=true'
+      - '--providers.docker=true'
+      - '--providers.docker.exposedbydefault=false'
+      - '--entryPoints.web.address=:80'
+    ports:
+      - '80:80'
+      - '8080:8080'
+    volumes:
+      - '/var/run/docker.sock:/var/run/docker.sock:ro'
+
+  auth_service:
+    build:
+      dockerfile: ./cmd/auth/Dockerfile
+    environment:
+      DB_DSN: ${DB_DSN}
+      REDIS_URI: ${REDIS_URI}
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.tasks.rule=Host(`api.kanesa.xyz`) && PathPrefix(`/auth`)'
+      - 'traefik.http.routers.tasks.entrypoints=web'
+      - 'traefik.http.services.tasks.loadbalancer.server.port=4000'
