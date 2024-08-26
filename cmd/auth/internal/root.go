@@ -5,11 +5,13 @@ import (
 	"os"
 	"os/signal"
 	"riderz/shared/common"
+	"riderz/shared/plugins/tokenprovider/jwt"
 	"syscall"
 	"time"
 
 	"github.com/phathdt/service-context/component/fiberc"
 	"github.com/phathdt/service-context/component/gormc"
+	"github.com/phathdt/service-context/component/redisc"
 
 	sctx "github.com/phathdt/service-context"
 
@@ -24,7 +26,9 @@ func newServiceCtx() sctx.ServiceContext {
 	return sctx.NewServiceContext(
 		sctx.WithName(serviceName),
 		sctx.WithComponent(fiberc.New(common.KeyCompFiber)),
-		sctx.WithComponent(gormc.NewGormDB(common.KeyDBMain, "")),
+		sctx.WithComponent(gormc.NewGormDB(common.KeyCompGorm, "")),
+		sctx.WithComponent(jwt.New(common.KeyJwt)),
+		sctx.WithComponent(redisc.New(common.KeyCompRedis)),
 	)
 }
 

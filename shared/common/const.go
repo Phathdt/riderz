@@ -15,5 +15,7 @@ func init() {
 
 const (
 	KeyCompFiber = "fiber"
-	KeyDBMain    = "mdb"
+	KeyCompGorm  = "postgres"
+	KeyCompRedis = "redis"
+	KeyJwt       = "jwt"
 )
