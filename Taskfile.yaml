@@ -1,0 +1,8 @@
+version: '3'
+
+dotenv: ['.env', '{{.ENV}}/.env.', '{{.HOME}}/.env']
+
+tasks:
+  auth:
+    cmds:
+      - cd cmd/auth && go run main.go
