@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"log"
@@ -35,15 +36,17 @@ var rootCmd = &cobra.Command{
 		flag.StringVar(&uri, "db_dsn", "", "database connection-string.")
 		flag.Parse()
 
+		ctx := context.Background()
+
 		command := args[0]
 		switch command {
 		case "create":
-			if err := goose.Run("create", nil, *dir, args[1:]...); err != nil {
+			if err := goose.RunContext(ctx, "create", nil, *dir, args[1:]...); err != nil {
 				log.Fatalf("migrate run: %v", err)
 			}
 			return
 		case "fix":
-			if err := goose.Run("fix", nil, *dir); err != nil {
+			if err := goose.RunContext(ctx, "fix", nil, *dir); err != nil {
 				log.Fatalf("migrate run: %v", err)
 			}
 			return
@@ -62,7 +65,7 @@ var rootCmd = &cobra.Command{
 			log.Fatal(err)
 		}
 
-		if err = goose.Run(command, db, *dir, args[1:]...); err != nil {
+		if err = goose.RunContext(ctx, command, db, *dir, args[1:]...); err != nil {
 			log.Fatalf("migrate run: %v", err)
 		}
 	},
