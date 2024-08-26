@@ -6,3 +6,8 @@ tasks:
   auth:
     cmds:
       - cd cmd/auth && go run main.go
+
+  migrate:
+    desc: migrate db
+    cmds:
+      - cd cmd/migrate && go run main.go {{.CLI_ARGS}}
