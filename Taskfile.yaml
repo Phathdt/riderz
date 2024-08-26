@@ -1,6 +1,6 @@
 version: '3'
 
-dotenv: ['.env', '{{.ENV}}/.env.', '{{.HOME}}/.env']
+dotenv: ['.env.local']
 
 tasks:
   auth:

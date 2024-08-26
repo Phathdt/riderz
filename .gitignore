@@ -12,3 +12,4 @@
 */.env
 /dex/dex.db
 /data
+/.env*
