@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"riderz/plugins/tokenprovider/jwt"
 	"riderz/shared/common"
-	"riderz/shared/plugins/tokenprovider/jwt"
 	"syscall"
 	"time"
 

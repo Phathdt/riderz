@@ -1,20 +1,19 @@
 package fiberauth
 
 import (
-	"net/http"
-	"riderz/modules/auth/handlers"
-	"riderz/modules/auth/models"
-	"riderz/modules/auth/repository/sessionRepo"
-	"riderz/modules/auth/storage"
-	"riderz/shared/common"
-	"riderz/shared/plugins/tokenprovider"
-	"riderz/shared/plugins/validation"
-
 	"github.com/gofiber/fiber/v2"
 	sctx "github.com/phathdt/service-context"
 	"github.com/phathdt/service-context/component/gormc"
 	"github.com/phathdt/service-context/component/redisc"
 	"github.com/phathdt/service-context/core"
+	"net/http"
+	"riderz/modules/auth/handlers"
+	"riderz/modules/auth/models"
+	"riderz/modules/auth/repository/sessionRepo"
+	"riderz/modules/auth/storage"
+	"riderz/plugins/tokenprovider"
+	"riderz/plugins/validation"
+	"riderz/shared/common"
 )
 
 func SignUp(sc sctx.ServiceContext) fiber.Handler {

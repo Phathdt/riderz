@@ -2,8 +2,8 @@ package middleware
 
 import (
 	"riderz/modules/auth/repository/sessionRepo"
+	"riderz/plugins/tokenprovider"
 	"riderz/shared/common"
-	"riderz/shared/plugins/tokenprovider"
 	"strings"
 
 	"github.com/gofiber/fiber/v2"

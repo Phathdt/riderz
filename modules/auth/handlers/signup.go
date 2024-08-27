@@ -3,14 +3,13 @@ package handlers
 import (
 	"context"
 	"errors"
-	"riderz/modules/auth/models"
-	"riderz/shared/common"
-	"riderz/shared/errorx"
-	"riderz/shared/plugins/tokenprovider"
-
 	"github.com/jaevor/go-nanoid"
 	"github.com/phathdt/service-context/core"
 	"golang.org/x/crypto/bcrypt"
+	"riderz/modules/auth/models"
+	"riderz/plugins/tokenprovider"
+	"riderz/shared/common"
+	"riderz/shared/errorx"
 )
 
 type SignupUser interface {

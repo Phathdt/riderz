@@ -3,8 +3,8 @@ package jwt
 import (
 	"flag"
 	"fmt"
+	"riderz/plugins/tokenprovider"
 	"riderz/shared/common"
-	"riderz/shared/plugins/tokenprovider"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
