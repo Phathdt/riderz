@@ -1,8 +1,6 @@
 version: '2'
 overrides:
   go:
-    rename:
-      id: 'ID'
     overrides:
       - db_type: 'pg_catalog.timestamp'
         engine: 'postgresql'

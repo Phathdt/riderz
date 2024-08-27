@@ -6,33 +6,34 @@ import (
 	"github.com/jaevor/go-nanoid"
 	"github.com/phathdt/service-context/core"
 	"golang.org/x/crypto/bcrypt"
-	"riderz/modules/auth/models"
+	"riderz/modules/auth/dto"
+	authRepo "riderz/modules/auth/repository/sql"
 	"riderz/plugins/tokenprovider"
 	"riderz/shared/common"
 	"riderz/shared/errorx"
 )
 
 type SignupUser interface {
-	GetUserByCondition(ctx context.Context, cond map[string]interface{}) (*models.User, error)
-	CreateUser(ctx context.Context, data *models.UserCreate) error
+	GetUserByEmail(ctx context.Context, email string) (*authRepo.User, error)
+	CreateUser(ctx context.Context, arg authRepo.CreateUserParams) (*authRepo.User, error)
 }
 
 type signUpSessionStorage interface {
-	SetUserToken(ctx context.Context, userId int, token, subToken string, expiredTime int) error
+	SetUserToken(ctx context.Context, userId int64, token, subToken string, expiredTime int) error
 }
 
 type signupHdl struct {
 	store         SignupUser
-	sStore        signUpSessionStorage
+	sessionStore  signUpSessionStorage
 	tokenProvider tokenprovider.Provider
 }
 
 func NewSignupHdl(store SignupUser, sStore signUpSessionStorage, tokenProvider tokenprovider.Provider) *signupHdl {
-	return &signupHdl{store: store, sStore: sStore, tokenProvider: tokenProvider}
+	return &signupHdl{store: store, sessionStore: sStore, tokenProvider: tokenProvider}
 }
 
-func (h *signupHdl) Response(ctx context.Context, params *models.SignupRequest) (tokenprovider.Token, error) {
-	user, err := h.store.GetUserByCondition(ctx, map[string]interface{}{"email": params.Email})
+func (h *signupHdl) Response(ctx context.Context, params *dto.SignupRequest) (tokenprovider.Token, error) {
+	user, err := h.store.GetUserByEmail(ctx, params.Email)
 	if err == nil && user != nil {
 		return nil, core.ErrBadRequest.
 			WithError(errorx.ErrUserAlreadyExists.Error()).
@@ -46,13 +47,10 @@ func (h *signupHdl) Response(ctx context.Context, params *models.SignupRequest) 
 			WithDebug(err.Error())
 	}
 
-	data := models.UserCreate{
-		SQLModel: core.NewSQLModel(),
-		Email:    params.Email,
-		Password: string(hashedPassword),
-	}
+	data := authRepo.CreateUserParams{Email: params.Email, Password: string(hashedPassword)}
 
-	if err = h.store.CreateUser(ctx, &data); err != nil {
+	newUser, err := h.store.CreateUser(ctx, data)
+	if err != nil {
 		return nil, core.ErrBadRequest.
 			WithError(errorx.ErrCreateUser.Error()).
 			WithDebug(err.Error())
@@ -62,7 +60,7 @@ func (h *signupHdl) Response(ctx context.Context, params *models.SignupRequest) 
 	subToken := canonicID()
 
 	payload := common.TokenPayload{
-		UserId:   data.Id,
+		UserId:   newUser.ID,
 		Email:    data.Email,
 		SubToken: subToken,
 	}
@@ -75,7 +73,7 @@ func (h *signupHdl) Response(ctx context.Context, params *models.SignupRequest) 
 			WithDebug(err.Error())
 	}
 
-	if err = h.sStore.SetUserToken(ctx, data.Id, accessToken.GetToken(), subToken, expiredTime); err != nil {
+	if err = h.sessionStore.SetUserToken(ctx, newUser.ID, accessToken.GetToken(), subToken, expiredTime); err != nil {
 		return nil, core.ErrBadRequest.
 			WithError(errorx.ErrGenToken.Error()).
 			WithDebug(err.Error())

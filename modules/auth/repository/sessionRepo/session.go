@@ -3,12 +3,11 @@ package sessionRepo
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
+	"github.com/pkg/errors"
 	"strings"
 	"time"
 
-	"github.com/pkg/errors"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -16,7 +15,7 @@ type sessionStore struct {
 	client *redis.Client
 }
 
-func (s *sessionStore) SetUserToken(ctx context.Context, userId int, token, subToken string, expiredTime int) error {
+func (s *sessionStore) SetUserToken(ctx context.Context, userId int64, token, subToken string, expiredTime int) error {
 	signature := strings.Split(token, ".")[2]
 	key := fmt.Sprintf("/users/%d/session/%s", userId, subToken)
 
@@ -32,7 +31,7 @@ func (s *sessionStore) SetUserToken(ctx context.Context, userId int, token, subT
 	return nil
 }
 
-func (s *sessionStore) GetUserToken(ctx context.Context, userId int, subToken string) (string, error) {
+func (s *sessionStore) GetUserToken(ctx context.Context, userId int64, subToken string) (string, error) {
 	key := fmt.Sprintf("/users/%d/session/%s", userId, subToken)
 
 	result, err := s.client.Get(ctx, key).Result()

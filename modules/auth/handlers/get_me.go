@@ -2,14 +2,14 @@ package handlers
 
 import (
 	"context"
-	"riderz/modules/auth/models"
+	authRepo "riderz/modules/auth/repository/sql"
 	"riderz/shared/errorx"
 
 	"github.com/phathdt/service-context/core"
 )
 
 type GetMeStorage interface {
-	GetUserByCondition(ctx context.Context, cond map[string]interface{}) (*models.User, error)
+	GetUserById(ctx context.Context, id int64) (*authRepo.User, error)
 }
 
 type getMeHdl struct {
@@ -20,8 +20,8 @@ func NewGetMeHdl(store GetMeStorage) *getMeHdl {
 	return &getMeHdl{store}
 }
 
-func (h *getMeHdl) Response(ctx context.Context, userId int) (*models.User, error) {
-	user, err := h.store.GetUserByCondition(ctx, map[string]interface{}{"id": userId})
+func (h *getMeHdl) Response(ctx context.Context, userId int64) (*authRepo.User, error) {
+	user, err := h.store.GetUserById(ctx, userId)
 	if err != nil {
 		return nil, core.ErrNotFound.
 			WithError(errorx.ErrCannotGetUser.Error()).

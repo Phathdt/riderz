@@ -3,14 +3,14 @@ package fiberauth
 import (
 	"github.com/gofiber/fiber/v2"
 	sctx "github.com/phathdt/service-context"
-	"github.com/phathdt/service-context/component/gormc"
 	"github.com/phathdt/service-context/component/redisc"
 	"github.com/phathdt/service-context/core"
 	"net/http"
+	"riderz/modules/auth/dto"
 	"riderz/modules/auth/handlers"
-	"riderz/modules/auth/models"
 	"riderz/modules/auth/repository/sessionRepo"
-	"riderz/modules/auth/storage"
+	authRepo "riderz/modules/auth/repository/sql"
+	"riderz/plugins/pgxc"
 	"riderz/plugins/tokenprovider"
 	"riderz/plugins/validation"
 	"riderz/shared/common"
@@ -18,7 +18,7 @@ import (
 
 func SignUp(sc sctx.ServiceContext) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
-		var p models.SignupRequest
+		var p dto.SignupRequest
 
 		if err := ctx.BodyParser(&p); err != nil {
 			panic(err)
@@ -28,11 +28,11 @@ func SignUp(sc sctx.ServiceContext) fiber.Handler {
 			panic(err)
 		}
 
-		db := sc.MustGet(common.KeyCompGorm).(gormc.GormComponent).GetDB()
+		conn := sc.MustGet(common.KeyPgx).(pgxc.PgxComp).GetConn()
 		tokenProvider := sc.MustGet(common.KeyJwt).(tokenprovider.Provider)
 		rdClient := sc.MustGet(common.KeyCompRedis).(redisc.RedisComponent).GetClient()
 
-		sqlStorage := storage.NewSqlStorage(db)
+		sqlStorage := authRepo.New(conn)
 		sessionStore := sessionRepo.NewSessionStore(rdClient)
 		hdl := handlers.NewSignupHdl(sqlStorage, sessionStore, tokenProvider)
 

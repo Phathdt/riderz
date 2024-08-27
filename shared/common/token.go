@@ -1,12 +1,12 @@
 package common
 
 type TokenPayload struct {
-	UserId   int    `json:"user_id"`
+	UserId   int64  `json:"user_id"`
 	Email    string `json:"email"`
 	SubToken string `json:"sub_token"`
 }
 
-func (t TokenPayload) GetUserId() int {
+func (t TokenPayload) GetUserId() int64 {
 	return t.UserId
 }
 
