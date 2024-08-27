@@ -3,6 +3,7 @@ module riderz
 go 1.22.0
 
 require (
+	github.com/cridenour/go-postgis v1.0.0
 	github.com/go-playground/validator/v10 v10.22.0
 	github.com/gofiber/fiber/v2 v2.52.4
 	github.com/golang-jwt/jwt/v5 v5.2.1

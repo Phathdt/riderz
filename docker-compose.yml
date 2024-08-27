@@ -92,15 +92,6 @@ services:
       - kafka2
       - kafka3
 
-  postgres-db:
-    image: postgres:16.2-alpine
-    ports:
-      - '15432:5432'
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 123123123
-      POSTGRES_DB: riderz
-
   redis-db:
     image: redis:7.2-alpine
     ports:
