@@ -1,13 +1,15 @@
-package storage
+package sessionRepo
 
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
-	"github.com/pkg/errors"
-	"github.com/redis/go-redis/v9"
 	"strings"
 	"time"
+
+	"github.com/pkg/errors"
+	"github.com/redis/go-redis/v9"
 )
 
 type sessionStore struct {
@@ -34,7 +36,7 @@ func (s *sessionStore) GetUserToken(ctx context.Context, userId int, subToken st
 	key := fmt.Sprintf("/users/%d/session/%s", userId, subToken)
 
 	result, err := s.client.Get(ctx, key).Result()
-	if err == redis.Nil {
+	if errors.Is(err, redis.Nil) {
 		return "", errors.New("not found")
 	} else if err != nil {
 		return "", errors.WithStack(err)

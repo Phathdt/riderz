@@ -9,13 +9,58 @@ import (
 	"context"
 )
 
-const getUser = `-- name: GetUser :one
+const createUser = `-- name: CreateUser :one
+INSERT INTO users (email, password)
+		VALUES($1, $2)
+	RETURNING
+		id, email, password, active, created_at, updated_at
+`
+
+type CreateUserParams struct {
+	Email    string `db:"email" json:"email"`
+	Password string `db:"password" json:"password"`
+}
+
+func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (*User, error) {
+	row := q.db.QueryRow(ctx, createUser, arg.Email, arg.Password)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.Password,
+		&i.Active,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return &i, err
+}
+
+const getUserByEmail = `-- name: GetUserByEmail :one
+SELECT id, email, password, active, created_at, updated_at FROM users
+WHERE email = $1 LIMIT 1
+`
+
+func (q *Queries) GetUserByEmail(ctx context.Context, email string) (*User, error) {
+	row := q.db.QueryRow(ctx, getUserByEmail, email)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.Password,
+		&i.Active,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return &i, err
+}
+
+const getUserById = `-- name: GetUserById :one
 SELECT id, email, password, active, created_at, updated_at FROM users
 WHERE id = $1 LIMIT 1
 `
 
-func (q *Queries) GetUser(ctx context.Context, id int64) (*User, error) {
-	row := q.db.QueryRow(ctx, getUser, id)
+func (q *Queries) GetUserById(ctx context.Context, id int64) (*User, error) {
+	row := q.db.QueryRow(ctx, getUserById, id)
 	var i User
 	err := row.Scan(
 		&i.ID,

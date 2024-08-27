@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"riderz/modules/auth/handlers"
 	"riderz/modules/auth/models"
+	"riderz/modules/auth/repository/sessionRepo"
 	"riderz/modules/auth/storage"
 	"riderz/shared/common"
 	"riderz/shared/plugins/tokenprovider"
@@ -33,7 +34,7 @@ func SignUp(sc sctx.ServiceContext) fiber.Handler {
 		rdClient := sc.MustGet(common.KeyCompRedis).(redisc.RedisComponent).GetClient()
 
 		sqlStorage := storage.NewSqlStorage(db)
-		sessionStore := storage.NewSessionStore(rdClient)
+		sessionStore := sessionRepo.NewSessionStore(rdClient)
 		hdl := handlers.NewSignupHdl(sqlStorage, sessionStore, tokenProvider)
 
 		token, err := hdl.Response(ctx.Context(), &p)

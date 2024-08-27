@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"riderz/modules/auth/storage"
+	"riderz/modules/auth/repository/sessionRepo"
 	"riderz/shared/common"
 	"riderz/shared/plugins/tokenprovider"
 	"strings"
@@ -48,7 +48,7 @@ func RequiredAuth(sc sctx.ServiceContext) fiber.Handler {
 			panic(core.ErrUnauthorized.WithError(err.Error()))
 		}
 		rdClient := sc.MustGet(common.KeyCompRedis).(redisc.RedisComponent).GetClient()
-		sessionStore := storage.NewSessionStore(rdClient)
+		sessionStore := sessionRepo.NewSessionStore(rdClient)
 
 		signature, err := sessionStore.GetUserToken(c.Context(), payload.GetUserId(), payload.GetSubToken())
 		if err != nil {
