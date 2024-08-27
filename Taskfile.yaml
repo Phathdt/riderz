@@ -3,6 +3,15 @@ version: '3'
 dotenv: ['.env.local']
 
 tasks:
+  gen-sql:
+    cmds:
+      - sqlc generate
+
+  migrate:
+    desc: migrate db
+    cmds:
+      - cd cmd/migrate && go run main.go {{.CLI_ARGS}}
+
   auth:
     cmds:
       - cd cmd/auth && go run main.go
@@ -10,8 +19,3 @@ tasks:
   location_ingestion:
     cmds:
       - cd cmd/location_ingestion && go run main.go
-
-  migrate:
-    desc: migrate db
-    cmds:
-      - cd cmd/migrate && go run main.go {{.CLI_ARGS}}

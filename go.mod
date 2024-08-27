@@ -6,6 +6,7 @@ require (
 	github.com/go-playground/validator/v10 v10.22.0
 	github.com/gofiber/fiber/v2 v2.52.4
 	github.com/golang-jwt/jwt/v5 v5.2.1
+	github.com/jackc/pgx/v5 v5.6.0
 	github.com/jaevor/go-nanoid v1.4.0
 	github.com/lib/pq v1.10.9
 	github.com/namsral/flag v1.7.4-pre
@@ -30,7 +31,6 @@ require (
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20231201235250-de7065d80cb9 // indirect
-	github.com/jackc/pgx/v5 v5.6.0 // indirect
 	github.com/jackc/puddle/v2 v2.2.1 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
