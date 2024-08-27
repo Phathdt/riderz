@@ -21,6 +21,7 @@ func NewUpdateLocationHdl(repo UpdateLocationRepo) *updateLocationHdl {
 }
 
 func (h *updateLocationHdl) Response(ctx context.Context, data *dto.UpdateLocationRequest) error {
+	//TODO: push to queue instead of update directly
 	err := h.repo.CreateLocation(ctx, locationRepo.CreateLocationParams{
 		UserID: data.UserId,
 		Lat:    data.Latitude,
