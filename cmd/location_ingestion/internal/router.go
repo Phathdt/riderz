@@ -1,8 +1,6 @@
 package cmd
 
 import (
-	"riderz/shared/common"
-
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/compress"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -10,6 +8,9 @@ import (
 	sctx "github.com/phathdt/service-context"
 	"github.com/phathdt/service-context/component/fiberc"
 	"github.com/phathdt/service-context/component/fiberc/middleware"
+	"riderz/modules/location/transport/fiberlocation"
+	"riderz/shared/common"
+	middleware2 "riderz/shared/middleware"
 )
 
 func NewRouter(sc sctx.ServiceContext) {
@@ -22,6 +23,10 @@ func NewRouter(sc sctx.ServiceContext) {
 	app.Use(middleware.Recover(sc))
 
 	app.Get("/", ping())
+
+	app.Use(middleware2.RequiredAuth(sc))
+
+	app.Post("/locations", fiberlocation.UpdateLocation(sc))
 
 	fiberComp := sc.MustGet(common.KeyCompFiber).(fiberc.FiberComponent)
 	fiberComp.SetApp(app)

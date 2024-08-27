@@ -4,15 +4,14 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
-	"riderz/plugins/tokenprovider/jwt"
+	"riderz/plugins/authcomp"
+	"riderz/plugins/pgxc"
 	"riderz/shared/common"
 	"syscall"
 	"time"
 
-	"github.com/phathdt/service-context/component/fiberc"
-	"github.com/phathdt/service-context/component/redisc"
-
 	sctx "github.com/phathdt/service-context"
+	"github.com/phathdt/service-context/component/fiberc"
 
 	"github.com/spf13/cobra"
 )
@@ -25,8 +24,8 @@ func newServiceCtx() sctx.ServiceContext {
 	return sctx.NewServiceContext(
 		sctx.WithName(serviceName),
 		sctx.WithComponent(fiberc.New(common.KeyCompFiber)),
-		sctx.WithComponent(jwt.New(common.KeyJwt)),
-		sctx.WithComponent(redisc.New(common.KeyCompRedis)),
+		sctx.WithComponent(pgxc.New(common.KeyPgx, "")),
+		sctx.WithComponent(authcomp.New(common.KeyAuthen)),
 	)
 }
 

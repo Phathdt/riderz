@@ -14,8 +14,9 @@ func init() {
 }
 
 const (
-	KeyCompFiber = "fiber"
+	KeyCompFiber = "fiberlocation"
 	KeyCompRedis = "redis"
 	KeyJwt       = "jwt"
 	KeyPgx       = "pgx"
+	KeyAuthen    = "authen"
 )

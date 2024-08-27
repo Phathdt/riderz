@@ -1,8 +1,13 @@
 package cmd
 
 import (
+	"github.com/phathdt/service-context/component/redisc"
+	"github.com/phathdt/service-context/core"
+	"riderz/modules/auth/repository/sessionRepo"
 	"riderz/modules/auth/transport/fiberauth"
+	"riderz/plugins/tokenprovider"
 	"riderz/shared/common"
+	"strings"
 
 	middleware2 "riderz/shared/middleware"
 
@@ -28,7 +33,7 @@ func NewRouter(sc sctx.ServiceContext) {
 	app.Post("/auth/signup", fiberauth.SignUp(sc))
 	app.Post("/auth/login", fiberauth.Login(sc))
 
-	app.Use(middleware2.RequiredAuth(sc))
+	app.Use(auth(sc))
 
 	app.Get("/auth/me", fiberauth.GetMe(sc))
 	app.Get("/auth/valid", fiberauth.CheckValid(sc))
@@ -42,5 +47,37 @@ func ping() fiber.Handler {
 		return ctx.Status(200).JSON(&fiber.Map{
 			"msg": "pong",
 		})
+	}
+}
+
+func auth(sc sctx.ServiceContext) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		headers := c.GetReqHeaders()
+		token, err := middleware2.ExtractTokenFromHeaderString(headers["Authorization"])
+
+		if err != nil {
+			panic(core.ErrUnauthorized.WithError(err.Error()))
+		}
+
+		tokenProvider := sc.MustGet(common.KeyJwt).(tokenprovider.Provider)
+
+		payload, err := tokenProvider.Validate(token)
+		if err != nil {
+			panic(core.ErrUnauthorized.WithError(err.Error()))
+		}
+		rdClient := sc.MustGet(common.KeyCompRedis).(redisc.RedisComponent).GetClient()
+		sessionStore := sessionRepo.NewSessionStore(rdClient)
+
+		signature, err := sessionStore.GetUserToken(c.Context(), payload.GetUserId(), payload.GetSubToken())
+		if err != nil {
+			panic(core.ErrUnauthorized.WithError(err.Error()))
+		}
+
+		if signature != strings.Split(token, ".")[2] {
+			panic(core.ErrUnauthorized.WithError("signature not matched"))
+		}
+
+		c.Context().SetUserValue("userId", payload.GetUserId())
+		return c.Next()
 	}
 }
