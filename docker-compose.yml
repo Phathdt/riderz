@@ -119,9 +119,9 @@ services:
       REDIS_URI: ${REDIS_URI}
     labels:
       - 'traefik.enable=true'
-      - 'traefik.http.routers.tasks.rule=Host(`api.kanesa.xyz`) && PathPrefix(`/auth`)'
-      - 'traefik.http.routers.tasks.entrypoints=web'
-      - 'traefik.http.services.tasks.loadbalancer.server.port=4000'
+      - 'traefik.http.routers.auth.rule=Host(`api.kanesa.xyz`) && PathPrefix(`/auth`)'
+      - 'traefik.http.routers.auth.entrypoints=web'
+      - 'traefik.http.services.auth.loadbalancer.server.port=4000'
 
   location_ingestion_service:
     build:
@@ -133,9 +133,9 @@ services:
       KAFKA_BROKERS: ${KAFKA_BROKERS}
     labels:
       - 'traefik.enable=true'
-      - 'traefik.http.routers.tasks.rule=Host(`api.kanesa.xyz`) && PathPrefix(`/locations`)'
-      - 'traefik.http.routers.tasks.entrypoints=web'
-      - 'traefik.http.services.tasks.loadbalancer.server.port=4000'
+      - 'traefik.http.routers.location_ingestion.rule=Host(`api.kanesa.xyz`) && PathPrefix(`/locations`)'
+      - 'traefik.http.routers.location_ingestion.entrypoints=web'
+      - 'traefik.http.services.location_ingestion.loadbalancer.server.port=4000'
 
   location_processing_service:
     build:

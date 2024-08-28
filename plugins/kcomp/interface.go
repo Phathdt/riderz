@@ -14,3 +14,5 @@ type KProducer interface {
 type KConsumer interface {
 	Subscribe(groupId string, topic string, handlerFunc func(msg *Message) error)
 }
+
+type HandlerFunc func(msg *Message) error

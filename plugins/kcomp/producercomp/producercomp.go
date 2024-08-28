@@ -37,7 +37,7 @@ func (c *producerComp) InitFlags() {
 func (c *producerComp) Activate(_ sctx.ServiceContext) error {
 	c.logger = sctx.GlobalLogger().GetLogger(c.id)
 
-	c.logger.Info("Connecting to Kafka...")
+	c.logger.Infof("Connecting to Kafka... %s", c.brokers)
 
 	c.writer = &kafka.Writer{
 		Addr:         kafka.TCP(strings.Split(c.brokers, ",")...),
