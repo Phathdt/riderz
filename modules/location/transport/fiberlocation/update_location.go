@@ -7,8 +7,7 @@ import (
 	"net/http"
 	"riderz/modules/location/dto"
 	"riderz/modules/location/handlers"
-	locationRepo "riderz/modules/location/repository/sql"
-	"riderz/plugins/pgxc"
+	"riderz/plugins/kcomp"
 	"riderz/plugins/validation"
 	"riderz/shared/common"
 )
@@ -28,10 +27,8 @@ func UpdateLocation(sc sctx.ServiceContext) fiber.Handler {
 
 		p.UserId = userId
 
-		conn := sc.MustGet(common.KeyPgx).(pgxc.PgxComp).GetConn()
-
-		sqlStorage := locationRepo.New(conn)
-		hdl := handlers.NewUpdateLocationHdl(sqlStorage)
+		producer := sc.MustGet(common.KeyKproducer).(kcomp.KProducer)
+		hdl := handlers.NewUpdateLocationHdl(producer)
 
 		if err := hdl.Response(ctx.Context(), &p); err != nil {
 			panic(err)

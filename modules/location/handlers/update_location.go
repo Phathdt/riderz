@@ -5,6 +5,7 @@ import (
 	"github.com/phathdt/service-context/core"
 	"riderz/modules/location/dto"
 	locationRepo "riderz/modules/location/repository/sql"
+	"riderz/plugins/kcomp"
 	"riderz/shared/errorx"
 )
 
@@ -13,21 +14,15 @@ type UpdateLocationRepo interface {
 }
 
 type updateLocationHdl struct {
-	repo UpdateLocationRepo
+	producer kcomp.KProducer
 }
 
-func NewUpdateLocationHdl(repo UpdateLocationRepo) *updateLocationHdl {
-	return &updateLocationHdl{repo: repo}
+func NewUpdateLocationHdl(producer kcomp.KProducer) *updateLocationHdl {
+	return &updateLocationHdl{producer: producer}
 }
 
 func (h *updateLocationHdl) Response(ctx context.Context, data *dto.UpdateLocationRequest) error {
-	//TODO: push to queue instead of update directly
-	err := h.repo.CreateLocation(ctx, locationRepo.CreateLocationParams{
-		UserID: data.UserId,
-		Lat:    data.Latitude,
-		Long:   data.Longitude,
-	})
-	if err != nil {
+	if err := h.producer.Publish("driver-locations", "", data); err != nil {
 		return core.ErrNotFound.
 			WithError(errorx.ErrCannotGetUser.Error()).
 			WithDebug(err.Error())
