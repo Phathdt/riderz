@@ -10,8 +10,7 @@ import (
 func SetupConsumer(sc sctx.ServiceContext) {
 	c := sc.MustGet(common.KeyConsumer).(kcomp.KConsumer)
 
-	c.Subscribe("driver-locations", func(msg *kcomp.Message) error {
-		// Xử lý message ở đây
+	c.Subscribe("demo-group", "driver-locations", func(msg *kcomp.Message) error {
 		fmt.Printf("Received message: Key=%s, Payload=%s\n", string(msg.Key), string(msg.Payload))
 		return nil
 	})

@@ -2,10 +2,9 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/phathdt/service-context/component/fiberc"
 	"os"
 	"os/signal"
-	kconsumercomp "riderz/plugins/kcomp/kconsumecomp"
+	kconsumercomp "riderz/plugins/kcomp/consumercomp"
 	"riderz/plugins/pgxc"
 	"riderz/shared/common"
 	"syscall"
@@ -22,7 +21,6 @@ const (
 func newServiceCtx() sctx.ServiceContext {
 	return sctx.NewServiceContext(
 		sctx.WithName(serviceName),
-		sctx.WithComponent(fiberc.New(common.KeyCompFiber)),
 		sctx.WithComponent(pgxc.New(common.KeyPgx, "")),
 		sctx.WithComponent(kconsumercomp.New(common.KeyConsumer)),
 	)
@@ -37,8 +35,6 @@ var rootCmd = &cobra.Command{
 		logger := sctx.GlobalLogger().GetLogger("service")
 
 		time.Sleep(time.Second * 1)
-
-		NewRouter(sc)
 
 		if err := sc.Load(); err != nil {
 			logger.Fatal(err)

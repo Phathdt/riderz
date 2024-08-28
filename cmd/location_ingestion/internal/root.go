@@ -5,7 +5,7 @@ import (
 	"os"
 	"os/signal"
 	"riderz/plugins/authcomp"
-	"riderz/plugins/kcomp/kproducercomp"
+	"riderz/plugins/kcomp/producercomp"
 	"riderz/plugins/pgxc"
 	"riderz/shared/common"
 	"syscall"
@@ -27,7 +27,7 @@ func newServiceCtx() sctx.ServiceContext {
 		sctx.WithComponent(fiberc.New(common.KeyCompFiber)),
 		sctx.WithComponent(pgxc.New(common.KeyPgx, "")),
 		sctx.WithComponent(authcomp.New(common.KeyAuthen)),
-		sctx.WithComponent(kproducercomp.New(common.KeyProducer)),
+		sctx.WithComponent(producercomp.New(common.KeyProducer)),
 	)
 }
 

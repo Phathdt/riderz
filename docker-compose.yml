@@ -63,20 +63,20 @@ services:
       CLUSTER_ID: 'ciWo7IWazngRchmPES6q5A=='
       KAFKA_LOG_DIRS: '/tmp/kraft-combined-logs'
 
-  schema-registry:
-    image: confluentinc/cp-schema-registry
-    container_name: schema-registry
-    hostname: schema-registry
-    ports:
-      - '28081:8081'
-    environment:
-      SCHEMA_REGISTRY_HOST_NAME: schema-registry
-      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: 'kafka1:29092,kafka2:29092,kafka3:29092'
-      SCHEMA_REGISTRY_LISTENERS: 'http://0.0.0.0:8081'
-    depends_on:
-      - kafka1
-      - kafka2
-      - kafka3
+  # schema-registry:
+  #   image: confluentinc/cp-schema-registry
+  #   container_name: schema-registry
+  #   hostname: schema-registry
+  #   ports:
+  #     - '28081:8081'
+  #   environment:
+  #     SCHEMA_REGISTRY_HOST_NAME: schema-registry
+  #     SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: 'kafka1:29092,kafka2:29092,kafka3:29092'
+  #     SCHEMA_REGISTRY_LISTENERS: 'http://0.0.0.0:8081'
+  #   depends_on:
+  #     - kafka1
+  #     - kafka2
+  #     - kafka3
 
   kafka-ui:
     image: provectuslabs/kafka-ui:v0.7.2
@@ -120,5 +120,33 @@ services:
     labels:
       - 'traefik.enable=true'
       - 'traefik.http.routers.tasks.rule=Host(`api.kanesa.xyz`) && PathPrefix(`/auth`)'
+      - 'traefik.http.routers.tasks.entrypoints=web'
+      - 'traefik.http.services.tasks.loadbalancer.server.port=4000'
+
+  location_ingestion_service:
+    build:
+      dockerfile: ./cmd/location_ingestion/Dockerfile
+    environment:
+      DB_DSN: ${DB_DSN}
+      REDIS_URI: ${REDIS_URI}
+      AUTHEN_ENDPOINT: ${AUTHEN_ENDPOINT}
+      KAFKA_BROKERS: ${KAFKA_BROKERS}
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.tasks.rule=Host(`api.kanesa.xyz`) && PathPrefix(`/locations`)'
+      - 'traefik.http.routers.tasks.entrypoints=web'
+      - 'traefik.http.services.tasks.loadbalancer.server.port=4000'
+
+  location_ingestion_service:
+    build:
+      dockerfile: ./cmd/location_ingestion/Dockerfile
+    environment:
+      DB_DSN: ${DB_DSN}
+      REDIS_URI: ${REDIS_URI}
+      AUTHEN_ENDPOINT: ${AUTHEN_ENDPOINT}
+      KAFKA_BROKERS: ${KAFKA_BROKERS}
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.tasks.rule=Host(`api.kanesa.xyz`) && PathPrefix(`/locations`)'
       - 'traefik.http.routers.tasks.entrypoints=web'
       - 'traefik.http.services.tasks.loadbalancer.server.port=4000'
