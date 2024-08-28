@@ -2,23 +2,21 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/phathdt/service-context/component/fiberc"
 	"os"
 	"os/signal"
-	"riderz/plugins/authcomp"
-	"riderz/plugins/kcomp/kproducercomp"
+	kconsumercomp "riderz/plugins/kcomp/kconsumecomp"
 	"riderz/plugins/pgxc"
 	"riderz/shared/common"
 	"syscall"
 	"time"
 
 	sctx "github.com/phathdt/service-context"
-	"github.com/phathdt/service-context/component/fiberc"
-
 	"github.com/spf13/cobra"
 )
 
 const (
-	serviceName = "location_ingestion"
+	serviceName = "location_processing"
 )
 
 func newServiceCtx() sctx.ServiceContext {
@@ -26,8 +24,7 @@ func newServiceCtx() sctx.ServiceContext {
 		sctx.WithName(serviceName),
 		sctx.WithComponent(fiberc.New(common.KeyCompFiber)),
 		sctx.WithComponent(pgxc.New(common.KeyPgx, "")),
-		sctx.WithComponent(authcomp.New(common.KeyAuthen)),
-		sctx.WithComponent(kproducercomp.New(common.KeyProducer)),
+		sctx.WithComponent(kconsumercomp.New(common.KeyConsumer)),
 	)
 }
 
@@ -47,6 +44,7 @@ var rootCmd = &cobra.Command{
 			logger.Fatal(err)
 		}
 
+		SetupConsumer(sc)
 		// gracefully shutdown
 		quit := make(chan os.Signal)
 		signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)

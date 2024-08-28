@@ -27,7 +27,7 @@ func UpdateLocation(sc sctx.ServiceContext) fiber.Handler {
 
 		p.UserId = userId
 
-		producer := sc.MustGet(common.KeyKproducer).(kcomp.KProducer)
+		producer := sc.MustGet(common.KeyProducer).(kcomp.KProducer)
 		hdl := handlers.NewUpdateLocationHdl(producer)
 
 		if err := hdl.Response(ctx.Context(), &p); err != nil {

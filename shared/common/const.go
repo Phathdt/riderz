@@ -19,5 +19,6 @@ const (
 	KeyJwt       = "jwt"
 	KeyPgx       = "pgx"
 	KeyAuthen    = "authen"
-	KeyKproducer = "kproducer"
+	KeyProducer  = "producer"
+	KeyConsumer  = "consumer"
 )
