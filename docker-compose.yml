@@ -137,16 +137,9 @@ services:
       - 'traefik.http.routers.tasks.entrypoints=web'
       - 'traefik.http.services.tasks.loadbalancer.server.port=4000'
 
-  location_ingestion_service:
+  location_processing_service:
     build:
       dockerfile: ./cmd/location_ingestion/Dockerfile
     environment:
       DB_DSN: ${DB_DSN}
-      REDIS_URI: ${REDIS_URI}
-      AUTHEN_ENDPOINT: ${AUTHEN_ENDPOINT}
       KAFKA_BROKERS: ${KAFKA_BROKERS}
-    labels:
-      - 'traefik.enable=true'
-      - 'traefik.http.routers.tasks.rule=Host(`api.kanesa.xyz`) && PathPrefix(`/locations`)'
-      - 'traefik.http.routers.tasks.entrypoints=web'
-      - 'traefik.http.services.tasks.loadbalancer.server.port=4000'
