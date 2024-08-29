@@ -143,3 +143,15 @@ services:
     environment:
       DB_DSN: ${DB_DSN}
       KAFKA_BROKERS: ${KAFKA_BROKERS}
+
+  location_query_service:
+    build:
+      dockerfile: ./cmd/location_query/Dockerfile
+    environment:
+      DB_DSN: ${DB_DSN}
+      AUTHEN_ENDPOINT: ${AUTHEN_ENDPOINT}
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.location_query.rule=Host(`api.kanesa.xyz`) && PathPrefix(`/locations`) && Method(`GET`)'
+      - 'traefik.http.routers.location_query.entrypoints=web'
+      - 'traefik.http.services.location_query.loadbalancer.server.port=4000'

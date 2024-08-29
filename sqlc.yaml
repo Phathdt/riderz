@@ -15,7 +15,7 @@ overrides:
           pointer: false
 
       - db_type: 'geometry'
-        go_type: 'github.com/cridenour/go-postgis.Point'
+        go_type: 'riderz/shared/common.PointS'
 
       - db_type: 'pg_catalog.numeric'
         go_type: 'float64'

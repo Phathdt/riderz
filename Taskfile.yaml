@@ -23,3 +23,7 @@ tasks:
   location_processing:
     cmds:
       - cd cmd/location_processing && go run main.go
+
+  location_query:
+    cmds:
+      - cd cmd/location_query && go run main.go

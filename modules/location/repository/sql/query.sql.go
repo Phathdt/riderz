@@ -8,7 +8,7 @@ package locationRepo
 import (
 	"context"
 
-	"github.com/cridenour/go-postgis"
+	"riderz/shared/common"
 )
 
 const createLocation = `-- name: CreateLocation :exec
@@ -50,27 +50,37 @@ func (q *Queries) GetLocation(ctx context.Context, userID int64) (*Location, err
 }
 
 const listLocations = `-- name: ListLocations :many
-SELECT id, user_id, geometry, ST_Distance(geometry, ST_SetSRID(ST_MakePoint($1::decimal, $2::decimal), 4326))::decimal AS distance
+SELECT id,
+  user_id,
+  geometry,
+  ST_Distance(geometry::geography, ST_SetSRID(ST_MakePoint($1::decimal, $2::decimal), 4326)::geography)::decimal AS distance
 FROM locations
+WHERE ST_DWithin(geometry::geography, ST_SetSRID(ST_MakePoint($1::decimal, $2::decimal), 4326)::geography, $3)
 ORDER BY geometry <-> ST_SetSRID(ST_MakePoint($1::decimal, $2::decimal), 4326)
-LIMIT $3
+LIMIT $4
 `
 
 type ListLocationsParams struct {
-	Lat  float64 `db:"lat" json:"lat"`
-	Long float64 `db:"long" json:"long"`
-	Size int32   `db:"size" json:"size"`
+	Lat      float64     `db:"lat" json:"lat"`
+	Long     float64     `db:"long" json:"long"`
+	Distance interface{} `db:"distance" json:"distance"`
+	Size     int32       `db:"size" json:"size"`
 }
 
 type ListLocationsRow struct {
 	ID       int64         `db:"id" json:"id"`
 	UserID   int64         `db:"user_id" json:"user_id"`
-	Geometry postgis.Point `db:"geometry" json:"geometry"`
+	Geometry common.PointS `db:"geometry" json:"geometry"`
 	Distance float64       `db:"distance" json:"distance"`
 }
 
 func (q *Queries) ListLocations(ctx context.Context, arg ListLocationsParams) ([]*ListLocationsRow, error) {
-	rows, err := q.db.Query(ctx, listLocations, arg.Lat, arg.Long, arg.Size)
+	rows, err := q.db.Query(ctx, listLocations,
+		arg.Lat,
+		arg.Long,
+		arg.Distance,
+		arg.Size,
+	)
 	if err != nil {
 		return nil, err
 	}
