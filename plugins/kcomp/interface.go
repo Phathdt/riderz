@@ -1,6 +1,12 @@
 package kcomp
 
-import "context"
+import (
+	"context"
+	"time"
+)
+
+type HandlerFunc func(msg *Message) error
+type HandlerMultiFunc func(msgs []*Message) error
 
 type Message struct {
 	Key     []byte
@@ -12,7 +18,6 @@ type KProducer interface {
 }
 
 type KConsumer interface {
-	Subscribe(groupId string, topic string, handlerFunc func(msg *Message) error)
+	Subscribe(groupId string, topic string, handlerFunc HandlerFunc)
+	BatchSubscribe(groupId string, topic string, batchTimeout time.Duration, batchSize int, handlerFunc HandlerMultiFunc)
 }
-
-type HandlerFunc func(msg *Message) error

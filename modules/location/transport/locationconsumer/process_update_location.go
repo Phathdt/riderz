@@ -31,3 +31,38 @@ func ProcessUpdateLocation(sc sctx.ServiceContext) kcomp.HandlerFunc {
 		return hdl.Response(ctx, &payload)
 	}
 }
+
+func ProcessUpdateMultiLocation(sc sctx.ServiceContext) kcomp.HandlerMultiFunc {
+	return func(msgs []*kcomp.Message) error {
+		mapUserRequest := make(map[int64]*dto.UpdateLocationRequest)
+
+		for _, msg := range msgs {
+			var payload dto.UpdateLocationRequest
+
+			err := json.Unmarshal(msg.Payload, &payload)
+			if err != nil {
+				continue
+			}
+
+			mapUserRequest[payload.UserId] = &payload
+		}
+
+		logger := sc.Logger("process-update-multi-location")
+
+		conn := sc.MustGet(common.KeyPgx).(pgxc.PgxComp).GetConn()
+		repo := locationRepo.New(conn)
+		hdl := handlers.NewProcessUpdateLocationHdl(repo)
+
+		for _, locationRequest := range mapUserRequest {
+			func() {
+				ctx := context.Background()
+				defer ctx.Done()
+				if err := hdl.Response(ctx, locationRequest); err != nil {
+					logger.Fatalf("failed to update userId %d: %v", locationRequest.UserId, err)
+				}
+			}()
+		}
+
+		return nil
+	}
+}
