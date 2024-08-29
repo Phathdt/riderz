@@ -139,7 +139,7 @@ services:
 
   location_processing_service:
     build:
-      dockerfile: ./cmd/location_ingestion/Dockerfile
+      dockerfile: ./cmd/location_processing/Dockerfile
     environment:
       DB_DSN: ${DB_DSN}
       KAFKA_BROKERS: ${KAFKA_BROKERS}
