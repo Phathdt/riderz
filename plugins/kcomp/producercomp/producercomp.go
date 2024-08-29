@@ -4,10 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"flag"
-	sctx "github.com/phathdt/service-context"
-	"github.com/segmentio/kafka-go"
 	"strings"
 	"time"
+
+	sctx "github.com/phathdt/service-context"
+	"github.com/segmentio/kafka-go"
 )
 
 type producerComp struct {
@@ -43,6 +44,26 @@ func (c *producerComp) Activate(_ sctx.ServiceContext) error {
 		Addr:         kafka.TCP(strings.Split(c.brokers, ",")...),
 		BatchTimeout: time.Millisecond * 100,
 		RequiredAcks: kafka.RequireAll,
+	}
+
+	dialer := &kafka.Dialer{
+		Timeout:   10 * time.Second,
+		DualStack: true,
+	}
+
+	var conn *kafka.Conn
+	var err error
+	for _, broker := range strings.Split(c.brokers, ",") {
+		conn, err = dialer.DialContext(context.Background(), "tcp", broker)
+		if err != nil {
+			break
+		}
+
+		conn.Close()
+	}
+
+	if err != nil {
+		return err
 	}
 
 	c.logger.Info("Connected to Kafka")

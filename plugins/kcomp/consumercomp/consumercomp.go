@@ -45,7 +45,30 @@ func (c *consumerComp) InitFlags() {
 
 func (c *consumerComp) Activate(_ sctx.ServiceContext) error {
 	c.logger = sctx.GlobalLogger().GetLogger(c.id)
-	c.logger.Info("Kafka consumer component activated")
+	c.logger.Infof("Connecting to Kafka... %s", c.brokers)
+
+	dialer := &kafka.Dialer{
+		Timeout:   10 * time.Second,
+		DualStack: true,
+	}
+
+	var conn *kafka.Conn
+	var err error
+	for _, broker := range strings.Split(c.brokers, ",") {
+		conn, err = dialer.DialContext(context.Background(), "tcp", broker)
+		if err != nil {
+			break
+		}
+
+		conn.Close()
+	}
+
+	if err != nil {
+		return err
+	}
+
+	c.logger.Info("Connected to Kafka")
+
 	return nil
 }
 
