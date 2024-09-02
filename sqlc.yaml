@@ -9,13 +9,29 @@ overrides:
           type: 'Time'
           pointer: false
 
+      - db_type: 'pg_catalog.timestamp'
+        engine: 'postgresql'
+        nullable: true
+        go_type:
+          import: 'time'
+          type: 'Time'
+          pointer: false
+
       - db_type: 'pg_catalog.bool'
         go_type:
           type: 'bool'
           pointer: false
 
+      - db_type: 'pg_catalog.int8'
+        nullable: true
+        go_type: 'int64'
+
       - db_type: 'geometry'
         go_type: 'riderz/shared/common.PointS'
+
+      - db_type: 'pg_catalog.numeric'
+        nullable: true
+        go_type: 'float64'
 
       - db_type: 'pg_catalog.numeric'
         go_type: 'float64'
@@ -34,6 +50,7 @@ sql:
         emit_prepared_queries: true
         emit_db_tags: true
         emit_result_struct_pointers: true
+
   - engine: 'postgresql'
     queries: 'modules/location/query/query.sql'
     schema: 'cmd/migrate/migrations'
@@ -41,6 +58,20 @@ sql:
       go:
         package: 'locationRepo'
         out: 'modules/location/repository/sql'
+        sql_package: 'pgx/v5'
+        omit_unused_structs: true
+        emit_json_tags: true
+        emit_prepared_queries: true
+        emit_db_tags: true
+        emit_result_struct_pointers: true
+
+  - engine: 'postgresql'
+    queries: 'modules/trip/query/query.sql'
+    schema: 'cmd/migrate/migrations'
+    gen:
+      go:
+        package: 'tripRepo'
+        out: 'modules/trip/repository/sql'
         sql_package: 'pgx/v5'
         omit_unused_structs: true
         emit_json_tags: true
