@@ -78,3 +78,6 @@ sql:
         emit_prepared_queries: true
         emit_db_tags: true
         emit_result_struct_pointers: true
+        overrides:
+          - column: 'trip_events.event_data'
+            go_type: 'riderz/modules/trip/dto.TripEventData'

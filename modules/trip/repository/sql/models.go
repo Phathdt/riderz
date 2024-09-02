@@ -7,6 +7,8 @@ package tripRepo
 import (
 	"time"
 
+	"github.com/jackc/pgx/v5/pgtype"
+	"riderz/modules/trip/dto"
 	"riderz/shared/common"
 )
 
@@ -27,4 +29,14 @@ type Trip struct {
 	Distance        float64       `db:"distance" json:"distance"`
 	CreatedAt       time.Time     `db:"created_at" json:"created_at"`
 	UpdatedAt       time.Time     `db:"updated_at" json:"updated_at"`
+}
+
+type TripEvent struct {
+	ID        int64             `db:"id" json:"id"`
+	TripID    int64             `db:"trip_id" json:"trip_id"`
+	EventType string            `db:"event_type" json:"event_type"`
+	Status    pgtype.Text       `db:"status" json:"status"`
+	EventData dto.TripEventData `db:"event_data" json:"event_data"`
+	CreatedAt time.Time         `db:"created_at" json:"created_at"`
+	UpdatedAt time.Time         `db:"updated_at" json:"updated_at"`
 }

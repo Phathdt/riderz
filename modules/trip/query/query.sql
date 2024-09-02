@@ -31,3 +31,16 @@ ORDER BY id DESC;
 UPDATE trips
 SET status = $2
 WHERE id = $1;
+
+-- name: CreateTripEvent :one
+INSERT INTO trip_events (
+    trip_id,
+    event_type,
+    status,
+    event_data
+) VALUES (
+    $1,
+    $2,
+    $3,
+    $4
+) RETURNING *;

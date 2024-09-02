@@ -7,6 +7,9 @@ package tripRepo
 
 import (
 	"context"
+
+	"github.com/jackc/pgx/v5/pgtype"
+	"riderz/modules/trip/dto"
 )
 
 const createTrip = `-- name: CreateTrip :one
@@ -69,6 +72,47 @@ func (q *Queries) CreateTrip(ctx context.Context, arg CreateTripParams) (*Trip, 
 		&i.EndTime,
 		&i.Price,
 		&i.Distance,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return &i, err
+}
+
+const createTripEvent = `-- name: CreateTripEvent :one
+INSERT INTO trip_events (
+    trip_id,
+    event_type,
+    status,
+    event_data
+) VALUES (
+    $1,
+    $2,
+    $3,
+    $4
+) RETURNING id, trip_id, event_type, status, event_data, created_at, updated_at
+`
+
+type CreateTripEventParams struct {
+	TripID    int64             `db:"trip_id" json:"trip_id"`
+	EventType string            `db:"event_type" json:"event_type"`
+	Status    pgtype.Text       `db:"status" json:"status"`
+	EventData dto.TripEventData `db:"event_data" json:"event_data"`
+}
+
+func (q *Queries) CreateTripEvent(ctx context.Context, arg CreateTripEventParams) (*TripEvent, error) {
+	row := q.db.QueryRow(ctx, createTripEvent,
+		arg.TripID,
+		arg.EventType,
+		arg.Status,
+		arg.EventData,
+	)
+	var i TripEvent
+	err := row.Scan(
+		&i.ID,
+		&i.TripID,
+		&i.EventType,
+		&i.Status,
+		&i.EventData,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
