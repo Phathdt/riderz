@@ -27,3 +27,7 @@ tasks:
   location_query:
     cmds:
       - cd cmd/location_query && go run main.go
+
+  trip:
+    cmds:
+      - cd cmd/trip && go run main.go
