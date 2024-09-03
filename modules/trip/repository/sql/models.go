@@ -29,3 +29,14 @@ type Trip struct {
 	CreatedAt       time.Time         `db:"created_at" json:"created_at"`
 	UpdatedAt       time.Time         `db:"updated_at" json:"updated_at"`
 }
+
+type TripEvent struct {
+	ID        int64                `db:"id" json:"id"`
+	TripID    int64                `db:"trip_id" json:"trip_id"`
+	TripCode  string               `db:"trip_code" json:"trip_code"`
+	EventType domain.TripEventType `db:"event_type" json:"event_type"`
+	EventTime time.Time            `db:"event_time" json:"event_time"`
+	EventData domain.TripEventData `db:"event_data" json:"event_data"`
+	CreatedAt time.Time            `db:"created_at" json:"created_at"`
+	UpdatedAt time.Time            `db:"updated_at" json:"updated_at"`
+}

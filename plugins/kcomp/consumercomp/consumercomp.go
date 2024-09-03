@@ -40,7 +40,7 @@ func (c *consumerComp) ID() string {
 }
 
 func (c *consumerComp) InitFlags() {
-	flag.StringVar(&c.brokers, "kafka-brokers", "localhost:9092", "Kafka broker addresses, comma-separated")
+	flag.StringVar(&c.brokers, "consumer-kafka-brokers", "localhost:9092", "Kafka broker addresses, comma-separated")
 }
 
 func (c *consumerComp) Activate(_ sctx.ServiceContext) error {

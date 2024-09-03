@@ -46,3 +46,14 @@ INSERT INTO trip_events (
     $4,
     $5
 ) RETURNING id;
+
+-- name: UpdateDriverId :exec
+UPDATE trips
+SET driver_id = $2
+WHERE trip_code = $1;
+
+-- name: ListTripEvents :many
+SELECT *
+FROM trip_events
+WHERE trip_code = $1
+ORDER BY event_time DESC;

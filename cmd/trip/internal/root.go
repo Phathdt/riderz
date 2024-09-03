@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/signal"
 	"riderz/plugins/authcomp"
+	kconsumercomp "riderz/plugins/kcomp/consumercomp"
 	"riderz/plugins/kcomp/producercomp"
 	"riderz/plugins/pgxc"
 	"riderz/shared/common"
@@ -28,6 +29,7 @@ func newServiceCtx() sctx.ServiceContext {
 		sctx.WithComponent(pgxc.New(common.KeyPgx, "")),
 		sctx.WithComponent(authcomp.New(common.KeyAuthen)),
 		sctx.WithComponent(producercomp.New(common.KeyProducer)),
+		sctx.WithComponent(kconsumercomp.New(common.KeyConsumer)),
 	)
 }
 
@@ -47,6 +49,7 @@ var rootCmd = &cobra.Command{
 			logger.Fatal(err)
 		}
 
+		SetupConsumer(sc)
 		// gracefully shutdown
 		quit := make(chan os.Signal)
 		signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)

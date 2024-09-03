@@ -29,7 +29,7 @@ func (c *producerComp) ID() string {
 func (c *producerComp) InitFlags() {
 	flag.StringVar(
 		&c.brokers,
-		"kafka-brokers",
+		"producer-kafka-brokers",
 		"localhost:9092",
 		"Kafka broker addresses, comma-separated",
 	)

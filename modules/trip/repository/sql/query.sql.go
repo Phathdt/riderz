@@ -132,6 +132,42 @@ func (q *Queries) GetTrip(ctx context.Context, arg GetTripParams) (*Trip, error)
 	return &i, err
 }
 
+const listTripEvents = `-- name: ListTripEvents :many
+SELECT id, trip_id, trip_code, event_type, event_time, event_data, created_at, updated_at
+FROM trip_events
+WHERE trip_code = $1
+ORDER BY event_time DESC
+`
+
+func (q *Queries) ListTripEvents(ctx context.Context, tripCode string) ([]*TripEvent, error) {
+	rows, err := q.db.Query(ctx, listTripEvents, tripCode)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*TripEvent
+	for rows.Next() {
+		var i TripEvent
+		if err := rows.Scan(
+			&i.ID,
+			&i.TripID,
+			&i.TripCode,
+			&i.EventType,
+			&i.EventTime,
+			&i.EventData,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listTrips = `-- name: ListTrips :many
 SELECT id, trip_code, user_id, driver_id, status, pickup_location, pickup_address, dropoff_location, dropoff_address, request_time, start_time, end_time, price, distance, created_at, updated_at
 FROM trips
@@ -174,6 +210,22 @@ func (q *Queries) ListTrips(ctx context.Context, userID int64) ([]*Trip, error) 
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateDriverId = `-- name: UpdateDriverId :exec
+UPDATE trips
+SET driver_id = $2
+WHERE trip_code = $1
+`
+
+type UpdateDriverIdParams struct {
+	TripCode string `db:"trip_code" json:"trip_code"`
+	DriverID *int64 `db:"driver_id" json:"driver_id"`
+}
+
+func (q *Queries) UpdateDriverId(ctx context.Context, arg UpdateDriverIdParams) error {
+	_, err := q.db.Exec(ctx, updateDriverId, arg.TripCode, arg.DriverID)
+	return err
 }
 
 const updateTripStatus = `-- name: UpdateTripStatus :exec
