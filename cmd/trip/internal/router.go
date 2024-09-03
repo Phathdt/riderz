@@ -28,6 +28,7 @@ func NewRouter(sc sctx.ServiceContext) {
 
 	app.Post("/trips", fibertrip.RequestTrip(sc))
 	app.Get("/trips/:trip_code", fibertrip.GetTrip(sc))
+	app.Get("/trips", fibertrip.ListTrip(sc))
 
 	fiberComp := sc.MustGet(common.KeyCompFiber).(fiberc.FiberComponent)
 	fiberComp.SetApp(app)
