@@ -19,7 +19,7 @@ INSERT INTO trips (
 
 -- name: GetTrip :one
 SELECT * FROM trips
-WHERE trip_code = $1;
+WHERE trip_code = $1 and user_id = $2;
 
 -- name: ListTrips :many
 SELECT *

@@ -1,0 +1,31 @@
+package handlers
+
+import (
+	"golang.org/x/net/context"
+	tripRepo "riderz/modules/trip/repository/sql"
+)
+
+type GetTripRepo interface {
+	GetTrip(ctx context.Context, arg tripRepo.GetTripParams) (*tripRepo.Trip, error)
+}
+
+type getTripHdl struct {
+	repo GetTripRepo
+}
+
+func NewGetTripHdl(repo GetTripRepo) *getTripHdl {
+	return &getTripHdl{repo: repo}
+}
+
+func (h *getTripHdl) Response(ctx context.Context, userID int64, tripCode string) (*tripRepo.Trip, error) {
+	trip, err := h.repo.GetTrip(ctx, tripRepo.GetTripParams{
+		TripCode: tripCode,
+		UserID:   userID,
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return trip, nil
+}
