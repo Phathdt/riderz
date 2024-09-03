@@ -14,7 +14,7 @@ type AssignDriverLocationRepo interface {
 }
 
 type AssignDriverRepo interface {
-	UpdateDriverId(ctx context.Context, arg tripRepo.UpdateDriverIdParams) error
+	AssignDriver(ctx context.Context, arg tripRepo.AssignDriverParams) error
 	CreateTripEvent(ctx context.Context, arg tripRepo.CreateTripEventParams) (int64, error)
 }
 
@@ -41,9 +41,10 @@ func (h *assignDriverHdl) Response(ctx context.Context, payload *domain.TripRequ
 
 	driverID := locations[0].UserID
 
-	if err = h.repo.UpdateDriverId(ctx, tripRepo.UpdateDriverIdParams{
+	if err = h.repo.AssignDriver(ctx, tripRepo.AssignDriverParams{
 		TripCode: payload.TripCode,
 		DriverID: &driverID,
+		Status:   domain.TripStatusDriverAssigned,
 	}); err != nil {
 		return err
 	}

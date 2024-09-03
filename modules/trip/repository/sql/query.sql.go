@@ -12,6 +12,23 @@ import (
 	"riderz/modules/trip/domain"
 )
 
+const assignDriver = `-- name: AssignDriver :exec
+UPDATE trips
+SET driver_id = $2, status = $3
+WHERE trip_code = $1
+`
+
+type AssignDriverParams struct {
+	TripCode string            `db:"trip_code" json:"trip_code"`
+	DriverID *int64            `db:"driver_id" json:"driver_id"`
+	Status   domain.TripStatus `db:"status" json:"status"`
+}
+
+func (q *Queries) AssignDriver(ctx context.Context, arg AssignDriverParams) error {
+	_, err := q.db.Exec(ctx, assignDriver, arg.TripCode, arg.DriverID, arg.Status)
+	return err
+}
+
 const createTrip = `-- name: CreateTrip :one
 INSERT INTO trips (
     trip_code,
@@ -210,22 +227,6 @@ func (q *Queries) ListTrips(ctx context.Context, userID int64) ([]*Trip, error) 
 		return nil, err
 	}
 	return items, nil
-}
-
-const updateDriverId = `-- name: UpdateDriverId :exec
-UPDATE trips
-SET driver_id = $2
-WHERE trip_code = $1
-`
-
-type UpdateDriverIdParams struct {
-	TripCode string `db:"trip_code" json:"trip_code"`
-	DriverID *int64 `db:"driver_id" json:"driver_id"`
-}
-
-func (q *Queries) UpdateDriverId(ctx context.Context, arg UpdateDriverIdParams) error {
-	_, err := q.db.Exec(ctx, updateDriverId, arg.TripCode, arg.DriverID)
-	return err
 }
 
 const updateTripStatus = `-- name: UpdateTripStatus :exec

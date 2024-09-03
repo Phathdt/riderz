@@ -47,9 +47,9 @@ INSERT INTO trip_events (
     $5
 ) RETURNING id;
 
--- name: UpdateDriverId :exec
+-- name: AssignDriver :exec
 UPDATE trips
-SET driver_id = $2
+SET driver_id = $2, status = $3
 WHERE trip_code = $1;
 
 -- name: ListTripEvents :many
