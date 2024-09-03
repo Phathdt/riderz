@@ -8,7 +8,7 @@ import (
 	sctx "github.com/phathdt/service-context"
 	"github.com/phathdt/service-context/component/fiberc"
 	"github.com/phathdt/service-context/component/fiberc/middleware"
-	"riderz/modules/trip/transport/fibertrip"
+	"riderz/modules/trip/transport/tripfiber"
 	"riderz/shared/common"
 	middleware2 "riderz/shared/middleware"
 )
@@ -26,9 +26,9 @@ func NewRouter(sc sctx.ServiceContext) {
 
 	app.Use(middleware2.RequiredAuth(sc))
 
-	app.Post("/trips", fibertrip.RequestTrip(sc))
-	app.Get("/trips/:trip_code", fibertrip.GetTrip(sc))
-	app.Get("/trips", fibertrip.ListTrip(sc))
+	app.Post("/trips", tripfiber.RequestTrip(sc))
+	app.Get("/trips/:trip_code", tripfiber.GetTrip(sc))
+	app.Get("/trips", tripfiber.ListTrip(sc))
 
 	fiberComp := sc.MustGet(common.KeyCompFiber).(fiberc.FiberComponent)
 	fiberComp.SetApp(app)
