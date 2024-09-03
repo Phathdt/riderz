@@ -22,3 +22,5 @@ const (
 	KeyProducer  = "producer"
 	KeyConsumer  = "consumer"
 )
+
+const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"

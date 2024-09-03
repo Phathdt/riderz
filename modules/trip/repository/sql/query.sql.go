@@ -7,9 +7,9 @@ package tripRepo
 
 import (
 	"context"
+	"time"
 
-	"github.com/jackc/pgx/v5/pgtype"
-	"riderz/modules/trip/dto"
+	"riderz/modules/trip/domain"
 )
 
 const createTrip = `-- name: CreateTrip :one
@@ -29,22 +29,22 @@ INSERT INTO trips (
     $4,
     ST_SetSRID(ST_MakePoint($8::decimal, $9::decimal), 4326),
     $5
-) RETURNING id, trip_code, user_id, driver_id, status, pickup_location, pickup_address, dropoff_location, dropoff_address, request_time, start_time, end_time, price, distance, created_at, updated_at
+) RETURNING id
 `
 
 type CreateTripParams struct {
-	TripCode       string  `db:"trip_code" json:"trip_code"`
-	UserID         int64   `db:"user_id" json:"user_id"`
-	Status         string  `db:"status" json:"status"`
-	PickupAddress  string  `db:"pickup_address" json:"pickup_address"`
-	DropoffAddress string  `db:"dropoff_address" json:"dropoff_address"`
-	PickupLong     float64 `db:"pickup_long" json:"pickup_long"`
-	PickupLat      float64 `db:"pickup_lat" json:"pickup_lat"`
-	DropoffLong    float64 `db:"dropoff_long" json:"dropoff_long"`
-	DropoffLat     float64 `db:"dropoff_lat" json:"dropoff_lat"`
+	TripCode       string            `db:"trip_code" json:"trip_code"`
+	UserID         int64             `db:"user_id" json:"user_id"`
+	Status         domain.TripStatus `db:"status" json:"status"`
+	PickupAddress  string            `db:"pickup_address" json:"pickup_address"`
+	DropoffAddress string            `db:"dropoff_address" json:"dropoff_address"`
+	PickupLong     float64           `db:"pickup_long" json:"pickup_long"`
+	PickupLat      float64           `db:"pickup_lat" json:"pickup_lat"`
+	DropoffLong    float64           `db:"dropoff_long" json:"dropoff_long"`
+	DropoffLat     float64           `db:"dropoff_lat" json:"dropoff_lat"`
 }
 
-func (q *Queries) CreateTrip(ctx context.Context, arg CreateTripParams) (*Trip, error) {
+func (q *Queries) CreateTrip(ctx context.Context, arg CreateTripParams) (int64, error) {
 	row := q.db.QueryRow(ctx, createTrip,
 		arg.TripCode,
 		arg.UserID,
@@ -56,76 +56,55 @@ func (q *Queries) CreateTrip(ctx context.Context, arg CreateTripParams) (*Trip, 
 		arg.DropoffLong,
 		arg.DropoffLat,
 	)
-	var i Trip
-	err := row.Scan(
-		&i.ID,
-		&i.TripCode,
-		&i.UserID,
-		&i.DriverID,
-		&i.Status,
-		&i.PickupLocation,
-		&i.PickupAddress,
-		&i.DropoffLocation,
-		&i.DropoffAddress,
-		&i.RequestTime,
-		&i.StartTime,
-		&i.EndTime,
-		&i.Price,
-		&i.Distance,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-	)
-	return &i, err
+	var id int64
+	err := row.Scan(&id)
+	return id, err
 }
 
 const createTripEvent = `-- name: CreateTripEvent :one
 INSERT INTO trip_events (
     trip_id,
+    trip_code,
     event_type,
-    status,
+    event_time,
     event_data
 ) VALUES (
     $1,
     $2,
     $3,
-    $4
-) RETURNING id, trip_id, event_type, status, event_data, created_at, updated_at
+    $4,
+    $5
+) RETURNING id
 `
 
 type CreateTripEventParams struct {
-	TripID    int64             `db:"trip_id" json:"trip_id"`
-	EventType string            `db:"event_type" json:"event_type"`
-	Status    pgtype.Text       `db:"status" json:"status"`
-	EventData dto.TripEventData `db:"event_data" json:"event_data"`
+	TripID    int64                `db:"trip_id" json:"trip_id"`
+	TripCode  string               `db:"trip_code" json:"trip_code"`
+	EventType domain.TripEventType `db:"event_type" json:"event_type"`
+	EventTime time.Time            `db:"event_time" json:"event_time"`
+	EventData domain.TripEventData `db:"event_data" json:"event_data"`
 }
 
-func (q *Queries) CreateTripEvent(ctx context.Context, arg CreateTripEventParams) (*TripEvent, error) {
+func (q *Queries) CreateTripEvent(ctx context.Context, arg CreateTripEventParams) (int64, error) {
 	row := q.db.QueryRow(ctx, createTripEvent,
 		arg.TripID,
+		arg.TripCode,
 		arg.EventType,
-		arg.Status,
+		arg.EventTime,
 		arg.EventData,
 	)
-	var i TripEvent
-	err := row.Scan(
-		&i.ID,
-		&i.TripID,
-		&i.EventType,
-		&i.Status,
-		&i.EventData,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-	)
-	return &i, err
+	var id int64
+	err := row.Scan(&id)
+	return id, err
 }
 
 const getTrip = `-- name: GetTrip :one
 SELECT id, trip_code, user_id, driver_id, status, pickup_location, pickup_address, dropoff_location, dropoff_address, request_time, start_time, end_time, price, distance, created_at, updated_at FROM trips
-WHERE id = $1
+WHERE trip_code = $1
 `
 
-func (q *Queries) GetTrip(ctx context.Context, id int64) (*Trip, error) {
-	row := q.db.QueryRow(ctx, getTrip, id)
+func (q *Queries) GetTrip(ctx context.Context, tripCode string) (*Trip, error) {
+	row := q.db.QueryRow(ctx, getTrip, tripCode)
 	var i Trip
 	err := row.Scan(
 		&i.ID,
@@ -195,15 +174,15 @@ func (q *Queries) ListTrips(ctx context.Context, userID int64) ([]*Trip, error) 
 const updateTripStatus = `-- name: UpdateTripStatus :exec
 UPDATE trips
 SET status = $2
-WHERE id = $1
+WHERE trip_code = $1
 `
 
 type UpdateTripStatusParams struct {
-	ID     int64  `db:"id" json:"id"`
-	Status string `db:"status" json:"status"`
+	TripCode string            `db:"trip_code" json:"trip_code"`
+	Status   domain.TripStatus `db:"status" json:"status"`
 }
 
 func (q *Queries) UpdateTripStatus(ctx context.Context, arg UpdateTripStatusParams) error {
-	_, err := q.db.Exec(ctx, updateTripStatus, arg.ID, arg.Status)
+	_, err := q.db.Exec(ctx, updateTripStatus, arg.TripCode, arg.Status)
 	return err
 }

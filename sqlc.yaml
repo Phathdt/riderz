@@ -80,4 +80,8 @@ sql:
         emit_result_struct_pointers: true
         overrides:
           - column: 'trip_events.event_data'
-            go_type: 'riderz/modules/trip/dto.TripEventData'
+            go_type: 'riderz/modules/trip/domain.TripEventData'
+          - column: 'trip_events.event_type'
+            go_type: 'riderz/modules/trip/domain.TripEventType'
+          - column: 'trips.status'
+            go_type: 'riderz/modules/trip/domain.TripStatus'

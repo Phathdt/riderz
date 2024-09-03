@@ -15,11 +15,11 @@ INSERT INTO trips (
     $4,
     ST_SetSRID(ST_MakePoint(@dropoff_long::decimal, @dropoff_lat::decimal), 4326),
     $5
-) RETURNING *;
+) RETURNING id;
 
 -- name: GetTrip :one
 SELECT * FROM trips
-WHERE id = $1;
+WHERE trip_code = $1;
 
 -- name: ListTrips :many
 SELECT *
@@ -30,17 +30,19 @@ ORDER BY id DESC;
 -- name: UpdateTripStatus :exec
 UPDATE trips
 SET status = $2
-WHERE id = $1;
+WHERE trip_code = $1;
 
 -- name: CreateTripEvent :one
 INSERT INTO trip_events (
     trip_id,
+    trip_code,
     event_type,
-    status,
+    event_time,
     event_data
 ) VALUES (
     $1,
     $2,
     $3,
-    $4
-) RETURNING *;
+    $4,
+    $5
+) RETURNING id;

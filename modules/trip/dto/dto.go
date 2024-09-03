@@ -1,12 +1,11 @@
 package dto
 
-import "riderz/shared/common"
-
-type TripEventData struct {
-	UserId         *int64         `json:"user_id"`
-	PickupLocation *common.PointS `json:"pickup_location"`
-	DriverId       *int64         `json:"driver_id"`
-	StartLocation  *common.PointS `json:"start_location"`
-	EndLocation    *common.PointS `json:"end_location"`
-	Amount         *float32       `json:"amount"`
+type CreateTripData struct {
+	UserID         int64   `json:"-"`
+	PickupLat      float64 `json:"pickup_lat" validate:"required"`
+	PickupLon      float64 `json:"pickup_lon" validate:"required"`
+	PickupAddress  string  `json:"pickup_address" validate:"required"`
+	DropoffLat     float64 `json:"dropoff_lat" validate:"required"`
+	DropoffLon     float64 `json:"dropoff_lon" validate:"required"`
+	DropoffAddress string  `json:"dropoff_address" validate:"required"`
 }
