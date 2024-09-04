@@ -1,7 +1,5 @@
 package dto
 
-import "time"
-
 type CreateTripData struct {
 	UserID         int64   `json:"-"`
 	PickupLat      float64 `json:"pickup_lat" validate:"required"`
@@ -24,15 +22,13 @@ type CancelTripData struct {
 }
 
 type StartTripData struct {
-	DriverID  int64     `json:"-"`
-	Lat       float64   `json:"lat" validate:"required"`
-	Long      float64   `json:"long" validate:"required"`
-	StartTime time.Time `json:"start_time" validate:"required"`
+	DriverID int64   `json:"-"`
+	Lat      float64 `json:"lat" validate:"required"`
+	Long     float64 `json:"long" validate:"required"`
 }
 
-type EndTripData struct {
-	DriverID int64     `json:"-"`
-	Lat      float64   `json:"lat" validate:"required"`
-	Long     float64   `json:"long" validate:"required"`
-	EndTime  time.Time `json:"end_time" validate:"required"`
+type CompleteTripData struct {
+	DriverID int64   `json:"-"`
+	Lat      float64 `json:"lat" validate:"required"`
+	Long     float64 `json:"long" validate:"required"`
 }

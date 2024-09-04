@@ -37,7 +37,7 @@ func NewRouter(sc sctx.ServiceContext) {
 	app.Get("/driver/trips", tripfiber.ListTrip(sc))
 	app.Post("/driver/trips/:trip_code/driver_arrived", tripfiber.DriverArrived(sc))
 	app.Post("/driver/trips/:trip_code/start", tripfiber.StartTrip(sc))
-	//app.Post("/driver/trips/:trip_code/end", tripfiber.EndTrip(sc))
+	app.Post("/driver/trips/:trip_code/complete", tripfiber.CompleteTrip(sc))
 
 	fiberComp := sc.MustGet(common.KeyCompFiber).(fiberc.FiberComponent)
 	fiberComp.SetApp(app)

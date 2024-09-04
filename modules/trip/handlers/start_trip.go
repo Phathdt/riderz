@@ -71,7 +71,7 @@ func (h *startTripHdl) Response(ctx context.Context, tripCode string, data *dto.
 		},
 	}
 
-	_ = h.producer.Publish(ctx, string(domain.TripCancelTopic), "", message)
+	_ = h.producer.Publish(ctx, string(domain.TripStartTopic), "", message)
 
 	return nil
 }

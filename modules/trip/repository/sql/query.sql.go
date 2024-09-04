@@ -30,6 +30,22 @@ func (q *Queries) AssignDriver(ctx context.Context, arg AssignDriverParams) erro
 	return err
 }
 
+const completeTrip = `-- name: CompleteTrip :exec
+UPDATE trips
+SET status = $2, end_time = now()
+WHERE trip_code = $1
+`
+
+type CompleteTripParams struct {
+	TripCode string            `db:"trip_code" json:"trip_code"`
+	Status   domain.TripStatus `db:"status" json:"status"`
+}
+
+func (q *Queries) CompleteTrip(ctx context.Context, arg CompleteTripParams) error {
+	_, err := q.db.Exec(ctx, completeTrip, arg.TripCode, arg.Status)
+	return err
+}
+
 const createTrip = `-- name: CreateTrip :one
 INSERT INTO trips (
     trip_code,
@@ -114,22 +130,6 @@ func (q *Queries) CreateTripEvent(ctx context.Context, arg CreateTripEventParams
 	var id int64
 	err := row.Scan(&id)
 	return id, err
-}
-
-const endTrip = `-- name: EndTrip :exec
-UPDATE trips
-SET status = $2, end_time = now()
-WHERE trip_code = $1
-`
-
-type EndTripParams struct {
-	TripCode string            `db:"trip_code" json:"trip_code"`
-	Status   domain.TripStatus `db:"status" json:"status"`
-}
-
-func (q *Queries) EndTrip(ctx context.Context, arg EndTripParams) error {
-	_, err := q.db.Exec(ctx, endTrip, arg.TripCode, arg.Status)
-	return err
 }
 
 const getTrip = `-- name: GetTrip :one

@@ -67,7 +67,7 @@ UPDATE trips
 SET status = $2, start_time = now()
 WHERE trip_code = $1;
 
--- name: EndTrip :exec
+-- name: CompleteTrip :exec
 UPDATE trips
 SET status = $2, end_time = now()
 WHERE trip_code = $1;
