@@ -35,6 +35,7 @@ type TripDriverArrivedMessage struct {
 		ArriveLocation Location `json:"arrive_location"`
 	} `json:"data"`
 }
+
 type TripCancelMessage struct {
 	EventType string    `json:"event_type"`
 	TripCode  string    `json:"trip_code"`
@@ -44,5 +45,25 @@ type TripCancelMessage struct {
 		CancellationReason string    `json:"cancellation_reason"`
 		CancelledBy        string    `json:"cancelled_by"`
 		CancellationTime   time.Time `json:"cancellation_time"`
+	} `json:"data"`
+}
+
+type TripStartMessage struct {
+	EventType string    `json:"event_type"`
+	TripCode  string    `json:"trip_code"`
+	Timestamp time.Time `json:"timestamp"`
+	Data      struct {
+		TripID        int64    `json:"trip_id"`
+		StartLocation Location `json:"start_location"`
+	} `json:"data"`
+}
+
+type TripEndMessage struct {
+	EventType string    `json:"event_type"`
+	TripCode  string    `json:"trip_code"`
+	Timestamp time.Time `json:"timestamp"`
+	Data      struct {
+		TripID      int64    `json:"trip_id"`
+		EndLocation Location `json:"end_location"`
 	} `json:"data"`
 }
