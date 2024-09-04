@@ -14,12 +14,12 @@ import (
 	"riderz/shared/common"
 )
 
-func DriverArrived(sc sctx.ServiceContext) fiber.Handler {
+func CancelTrip(sc sctx.ServiceContext) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 		userId := ctx.Context().UserValue("userId").(int64)
 		tripCode := ctx.Params("trip_code")
 
-		var p dto.DriverArrivedData
+		var p dto.CancelTripData
 
 		if err := ctx.BodyParser(&p); err != nil {
 			panic(err)
@@ -29,12 +29,12 @@ func DriverArrived(sc sctx.ServiceContext) fiber.Handler {
 			panic(err)
 		}
 
-		p.DriverID = userId
+		p.UserID = userId
 
 		producer := sc.MustGet(common.KeyProducer).(kcomp.KProducer)
 		conn := sc.MustGet(common.KeyPgx).(pgxc.PgxComp).GetConn()
 		repo := tripRepo.New(conn)
-		hdl := handlers.NewDriverArrivedHdl(repo, producer)
+		hdl := handlers.NewCancelTripHdl(repo, producer)
 
 		err := hdl.Response(ctx.Context(), tripCode, &p)
 		if err != nil {

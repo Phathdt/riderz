@@ -15,3 +15,8 @@ type DriverArrivedData struct {
 	Lat      float64 `json:"lat" validate:"required"`
 	Long     float64 `json:"long" validate:"required"`
 }
+
+type CancelTripData struct {
+	UserID int64  `json:"-"`
+	Reason string `json:"reason" validate:"required"`
+}

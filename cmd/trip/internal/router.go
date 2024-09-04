@@ -30,7 +30,7 @@ func NewRouter(sc sctx.ServiceContext) {
 	app.Post("/trips", tripfiber.RequestTrip(sc))
 	app.Get("/trips/:trip_code", tripfiber.GetTrip(sc))
 	app.Get("/trips", tripfiber.ListTrip(sc))
-	//app.Post("/user/trips/:trip_code/cancel", tripfiber.CancelTrip(sc))
+	app.Post("/user/trips/:trip_code/cancel", tripfiber.CancelTrip(sc))
 
 	//driver scope
 	app.Get("/driver/trips/:trip_code", tripfiber.GetTrip(sc))
