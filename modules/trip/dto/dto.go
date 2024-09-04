@@ -9,3 +9,9 @@ type CreateTripData struct {
 	DropoffLon     float64 `json:"dropoff_lon" validate:"required"`
 	DropoffAddress string  `json:"dropoff_address" validate:"required"`
 }
+
+type DriverArrivedData struct {
+	DriverID int64   `json:"-"`
+	Lat      float64 `json:"lat" validate:"required"`
+	Long     float64 `json:"long" validate:"required"`
+}

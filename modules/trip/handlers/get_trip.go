@@ -6,7 +6,7 @@ import (
 )
 
 type GetTripRepo interface {
-	GetTrip(ctx context.Context, arg tripRepo.GetTripParams) (*tripRepo.Trip, error)
+	GetTripByUser(ctx context.Context, arg tripRepo.GetTripByUserParams) (*tripRepo.Trip, error)
 }
 
 type getTripHdl struct {
@@ -18,7 +18,7 @@ func NewGetTripHdl(repo GetTripRepo) *getTripHdl {
 }
 
 func (h *getTripHdl) Response(ctx context.Context, userID int64, tripCode string) (*tripRepo.Trip, error) {
-	trip, err := h.repo.GetTrip(ctx, tripRepo.GetTripParams{
+	trip, err := h.repo.GetTripByUser(ctx, tripRepo.GetTripByUserParams{
 		TripCode: tripCode,
 		UserID:   userID,
 	})

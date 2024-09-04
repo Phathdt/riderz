@@ -117,16 +117,45 @@ func (q *Queries) CreateTripEvent(ctx context.Context, arg CreateTripEventParams
 
 const getTrip = `-- name: GetTrip :one
 SELECT id, trip_code, user_id, driver_id, status, pickup_location, pickup_address, dropoff_location, dropoff_address, request_time, start_time, end_time, price, distance, created_at, updated_at FROM trips
+WHERE trip_code = $1
+`
+
+func (q *Queries) GetTrip(ctx context.Context, tripCode string) (*Trip, error) {
+	row := q.db.QueryRow(ctx, getTrip, tripCode)
+	var i Trip
+	err := row.Scan(
+		&i.ID,
+		&i.TripCode,
+		&i.UserID,
+		&i.DriverID,
+		&i.Status,
+		&i.PickupLocation,
+		&i.PickupAddress,
+		&i.DropoffLocation,
+		&i.DropoffAddress,
+		&i.RequestTime,
+		&i.StartTime,
+		&i.EndTime,
+		&i.Price,
+		&i.Distance,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return &i, err
+}
+
+const getTripByUser = `-- name: GetTripByUser :one
+SELECT id, trip_code, user_id, driver_id, status, pickup_location, pickup_address, dropoff_location, dropoff_address, request_time, start_time, end_time, price, distance, created_at, updated_at FROM trips
 WHERE trip_code = $1 and user_id = $2
 `
 
-type GetTripParams struct {
+type GetTripByUserParams struct {
 	TripCode string `db:"trip_code" json:"trip_code"`
 	UserID   int64  `db:"user_id" json:"user_id"`
 }
 
-func (q *Queries) GetTrip(ctx context.Context, arg GetTripParams) (*Trip, error) {
-	row := q.db.QueryRow(ctx, getTrip, arg.TripCode, arg.UserID)
+func (q *Queries) GetTripByUser(ctx context.Context, arg GetTripByUserParams) (*Trip, error) {
+	row := q.db.QueryRow(ctx, getTripByUser, arg.TripCode, arg.UserID)
 	var i Trip
 	err := row.Scan(
 		&i.ID,

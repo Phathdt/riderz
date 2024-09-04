@@ -5,6 +5,7 @@ type TripStatus string
 const (
 	TripStatusRequested      TripStatus = "REQUESTED"
 	TripStatusDriverAssigned TripStatus = "DRIVER_ASSIGNED"
+	TripStatusDriverArrived  TripStatus = "DRIVER_ARRIVED"
 	TripStatusStarted        TripStatus = "STARTED"
 	TripStatusCompleted      TripStatus = "COMPLETED"
 	TripStatusCancelled      TripStatus = "CANCELLED"
