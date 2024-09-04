@@ -6,6 +6,7 @@ require (
 	github.com/go-playground/validator/v10 v10.22.0
 	github.com/gofiber/fiber/v2 v2.52.4
 	github.com/golang-jwt/jwt/v5 v5.2.1
+	github.com/guregu/null/v5 v5.0.0
 	github.com/imroc/req/v3 v3.43.7
 	github.com/jackc/pgx/v5 v5.6.0
 	github.com/jaevor/go-nanoid v1.4.0
@@ -18,6 +19,7 @@ require (
 	github.com/segmentio/kafka-go v0.4.47
 	github.com/spf13/cobra v1.8.1
 	golang.org/x/crypto v0.26.0
+	golang.org/x/net v0.28.0
 )
 
 require (
@@ -63,7 +65,6 @@ require (
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/exp v0.0.0-20240325151524-a685a6edb6d8 // indirect
 	golang.org/x/mod v0.17.0 // indirect
-	golang.org/x/net v0.28.0 // indirect
 	golang.org/x/sync v0.8.0 // indirect
 	golang.org/x/sys v0.24.0 // indirect
 	golang.org/x/text v0.17.0 // indirect

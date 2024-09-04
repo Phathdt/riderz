@@ -13,17 +13,23 @@ overrides:
         engine: 'postgresql'
         nullable: true
         go_type:
-          import: 'time'
-          type: 'Time'
-          pointer: true
+          import: github.com/guregu/null/v5
+          package: 'null'
+          type: Time
 
       - db_type: 'pg_catalog.bool'
+        nullable: true
         go_type:
-          type: 'bool'
-          pointer: false
+          import: github.com/guregu/null/v5
+          package: 'null'
+          type: Bool
 
       - db_type: 'pg_catalog.int8'
-        go_type: 'int64'
+        nullable: true
+        go_type:
+          import: github.com/guregu/null/v5
+          package: 'null'
+          type: Int64
 
       - db_type: 'geometry'
         go_type: 'riderz/shared/common.PointS'
@@ -34,8 +40,9 @@ overrides:
       - db_type: 'pg_catalog.numeric'
         nullable: true
         go_type:
-          type: 'float64'
-          pointer: true
+          import: github.com/guregu/null/v5
+          package: 'null'
+          type: Float
 
 sql:
   - engine: 'postgresql'

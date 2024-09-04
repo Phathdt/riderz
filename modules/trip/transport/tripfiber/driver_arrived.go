@@ -6,12 +6,7 @@ import (
 	"github.com/phathdt/service-context/core"
 	"net/http"
 	"riderz/modules/trip/dto"
-	"riderz/modules/trip/handlers"
-	tripRepo "riderz/modules/trip/repository/sql"
-	"riderz/plugins/kcomp"
-	"riderz/plugins/pgxc"
 	"riderz/plugins/validation"
-	"riderz/shared/common"
 )
 
 func DriverArrived(sc sctx.ServiceContext) fiber.Handler {
@@ -31,15 +26,15 @@ func DriverArrived(sc sctx.ServiceContext) fiber.Handler {
 
 		p.DriverID = userId
 
-		producer := sc.MustGet(common.KeyProducer).(kcomp.KProducer)
-		conn := sc.MustGet(common.KeyPgx).(pgxc.PgxComp).GetConn()
-		repo := tripRepo.New(conn)
-		hdl := handlers.NewRequestTripHdl(producer, repo)
-
-		tripCode, err := hdl.Response(ctx.Context(), &p)
-		if err != nil {
-			panic(err)
-		}
+		//producer := sc.MustGet(common.KeyProducer).(kcomp.KProducer)
+		//conn := sc.MustGet(common.KeyPgx).(pgxc.PgxComp).GetConn()
+		//repo := tripRepo.New(conn)
+		//hdl := handlers.NewRequestTripHdl(producer, repo)
+		//
+		//tripCode, err := hdl.Response(ctx.Context(), &p)
+		//if err != nil {
+		//	panic(err)
+		//}
 
 		return ctx.Status(http.StatusOK).JSON(core.SimpleSuccessResponse(map[string]interface{}{
 			"trip_code": tripCode,

@@ -9,6 +9,7 @@ import (
 	"context"
 	"time"
 
+	null "github.com/guregu/null/v5"
 	"riderz/modules/trip/domain"
 )
 
@@ -20,7 +21,7 @@ WHERE trip_code = $1
 
 type AssignDriverParams struct {
 	TripCode string            `db:"trip_code" json:"trip_code"`
-	DriverID *int64            `db:"driver_id" json:"driver_id"`
+	DriverID null.Int64        `db:"driver_id" json:"driver_id"`
 	Status   domain.TripStatus `db:"status" json:"status"`
 }
 

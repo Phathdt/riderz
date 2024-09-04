@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"github.com/guregu/null/v5"
 	"golang.org/x/net/context"
 	locationRepo "riderz/modules/location/repository/sql"
 	"riderz/modules/trip/domain"
@@ -43,7 +44,7 @@ func (h *assignDriverHdl) Response(ctx context.Context, payload *domain.TripRequ
 
 	if err = h.repo.AssignDriver(ctx, tripRepo.AssignDriverParams{
 		TripCode: payload.TripCode,
-		DriverID: &driverID,
+		DriverID: null.IntFrom(driverID),
 		Status:   domain.TripStatusDriverAssigned,
 	}); err != nil {
 		return err
