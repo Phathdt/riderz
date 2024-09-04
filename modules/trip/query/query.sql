@@ -61,3 +61,13 @@ SELECT *
 FROM trip_events
 WHERE trip_code = $1
 ORDER BY event_time DESC;
+
+-- name: StartTrip :exec
+UPDATE trips
+SET status = $2, start_time = now()
+WHERE trip_code = $1;
+
+-- name: EndTrip :exec
+UPDATE trips
+SET status = $2, end_time = now()
+WHERE trip_code = $1;

@@ -116,6 +116,22 @@ func (q *Queries) CreateTripEvent(ctx context.Context, arg CreateTripEventParams
 	return id, err
 }
 
+const endTrip = `-- name: EndTrip :exec
+UPDATE trips
+SET status = $2, end_time = now()
+WHERE trip_code = $1
+`
+
+type EndTripParams struct {
+	TripCode string            `db:"trip_code" json:"trip_code"`
+	Status   domain.TripStatus `db:"status" json:"status"`
+}
+
+func (q *Queries) EndTrip(ctx context.Context, arg EndTripParams) error {
+	_, err := q.db.Exec(ctx, endTrip, arg.TripCode, arg.Status)
+	return err
+}
+
 const getTrip = `-- name: GetTrip :one
 SELECT id, trip_code, user_id, driver_id, status, pickup_location, pickup_address, dropoff_location, dropoff_address, request_time, start_time, end_time, price, distance, created_at, updated_at FROM trips
 WHERE trip_code = $1
@@ -257,6 +273,22 @@ func (q *Queries) ListTrips(ctx context.Context, userID int64) ([]*Trip, error) 
 		return nil, err
 	}
 	return items, nil
+}
+
+const startTrip = `-- name: StartTrip :exec
+UPDATE trips
+SET status = $2, start_time = now()
+WHERE trip_code = $1
+`
+
+type StartTripParams struct {
+	TripCode string            `db:"trip_code" json:"trip_code"`
+	Status   domain.TripStatus `db:"status" json:"status"`
+}
+
+func (q *Queries) StartTrip(ctx context.Context, arg StartTripParams) error {
+	_, err := q.db.Exec(ctx, startTrip, arg.TripCode, arg.Status)
+	return err
 }
 
 const updateTripStatus = `-- name: UpdateTripStatus :exec
