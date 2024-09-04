@@ -24,3 +24,14 @@ type TripDriverAssignedMessage struct {
 		EstimatedPickupTime time.Time `json:"estimated_pickup_time"`
 	} `json:"data"`
 }
+
+type TripDriverArrivedMessage struct {
+	EventType string    `json:"event_type"`
+	TripCode  string    `json:"trip_code"`
+	Timestamp time.Time `json:"timestamp"`
+	Data      struct {
+		TripID         int64    `json:"trip_id"`
+		DriverID       int64    `json:"driver_id"`
+		ArriveLocation Location `json:"arrive_location"`
+	} `json:"data"`
+}

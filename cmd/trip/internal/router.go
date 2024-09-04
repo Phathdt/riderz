@@ -26,9 +26,18 @@ func NewRouter(sc sctx.ServiceContext) {
 
 	app.Use(middleware2.RequiredAuth(sc))
 
+	//user scope
 	app.Post("/trips", tripfiber.RequestTrip(sc))
 	app.Get("/trips/:trip_code", tripfiber.GetTrip(sc))
 	app.Get("/trips", tripfiber.ListTrip(sc))
+	//app.Post("/user/trips/:trip_code/cancel", tripfiber.CancelTrip(sc))
+
+	//driver scope
+	app.Get("/driver/trips/:trip_code", tripfiber.GetTrip(sc))
+	app.Get("/driver/trips", tripfiber.ListTrip(sc))
+	app.Post("/driver/trips/:trip_code/driver_arrived", tripfiber.DriverArrived(sc))
+	//app.Post("/driver/trips/:trip_code/start", tripfiber.StartTrip(sc))
+	//app.Post("/driver/trips/:trip_code/end", tripfiber.EndTrip(sc))
 
 	fiberComp := sc.MustGet(common.KeyCompFiber).(fiberc.FiberComponent)
 	fiberComp.SetApp(app)
