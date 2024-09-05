@@ -10,9 +10,8 @@ import (
 )
 
 type StartTripRepo interface {
-	StartTrip(ctx context.Context, arg tripRepo.StartTripParams) error
 	GetTrip(ctx context.Context, tripCode string) (*tripRepo.Trip, error)
-	CreateTripEvent(ctx context.Context, arg tripRepo.CreateTripEventParams) (int64, error)
+	StartTripWithEvent(ctx context.Context, arg tripRepo.StartTripParams, eventArg tripRepo.CreateTripEventParams) error
 }
 
 type startTripHdl struct {
@@ -30,14 +29,12 @@ func (h *startTripHdl) Response(ctx context.Context, tripCode string, data *dto.
 		return err
 	}
 
-	if err := h.repo.StartTrip(ctx, tripRepo.StartTripParams{
+	startTripParams := tripRepo.StartTripParams{
 		TripCode: tripCode,
 		Status:   domain.TripStatusStarted,
-	}); err != nil {
-		return err
 	}
 
-	if _, err := h.repo.CreateTripEvent(ctx, tripRepo.CreateTripEventParams{
+	tripEventData := tripRepo.CreateTripEventParams{
 		TripID:    trip.ID,
 		TripCode:  trip.TripCode,
 		EventType: domain.TripEventTypeStarted,
@@ -51,7 +48,9 @@ func (h *startTripHdl) Response(ctx context.Context, tripCode string, data *dto.
 				StartTime: time.Now(),
 			},
 		},
-	}); err != nil {
+	}
+
+	if err = h.repo.StartTripWithEvent(ctx, startTripParams, tripEventData); err != nil {
 		return err
 	}
 

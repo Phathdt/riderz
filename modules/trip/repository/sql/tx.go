@@ -35,3 +35,31 @@ func (q *Queries) CreateTripAndEvent(ctx context.Context, tripArg CreateTripPara
 
 	return tripID, nil
 }
+
+func (q *Queries) StartTripWithEvent(ctx context.Context, arg StartTripParams, eventArg CreateTripEventParams) (err error) {
+	db := q.db.(*pgxpool.Pool)
+
+	tx, err := db.Begin(ctx)
+	if err != nil {
+		return fmt.Errorf("error starting transaction: %w", err)
+	}
+	defer tx.Rollback(ctx)
+
+	qtx := q.WithTx(tx)
+
+	err = qtx.StartTrip(ctx, arg)
+	if err != nil {
+		return fmt.Errorf("error creating trip: %w", err)
+	}
+
+	_, err = qtx.CreateTripEvent(ctx, eventArg)
+	if err != nil {
+		return fmt.Errorf("error creating trip event: %w", err)
+	}
+
+	if err = tx.Commit(ctx); err != nil {
+		return fmt.Errorf("error committing transaction: %w", err)
+	}
+
+	return nil
+}
