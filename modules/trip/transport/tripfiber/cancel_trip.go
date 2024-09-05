@@ -3,6 +3,7 @@ package tripfiber
 import (
 	"github.com/gofiber/fiber/v2"
 	sctx "github.com/phathdt/service-context"
+	"github.com/phathdt/service-context/component/validation"
 	"github.com/phathdt/service-context/core"
 	"net/http"
 	"riderz/modules/trip/dto"
@@ -10,7 +11,6 @@ import (
 	tripRepo "riderz/modules/trip/repository/sql"
 	"riderz/plugins/kcomp"
 	"riderz/plugins/pgxc"
-	"riderz/plugins/validation"
 	"riderz/shared/common"
 )
 

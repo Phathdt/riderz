@@ -4,6 +4,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	sctx "github.com/phathdt/service-context"
 	"github.com/phathdt/service-context/component/redisc"
+	"github.com/phathdt/service-context/component/validation"
 	"github.com/phathdt/service-context/core"
 	"net/http"
 	"riderz/modules/auth/dto"
@@ -12,7 +13,6 @@ import (
 	authRepo "riderz/modules/auth/repository/sql"
 	"riderz/plugins/pgxc"
 	"riderz/plugins/tokenprovider"
-	"riderz/plugins/validation"
 	"riderz/shared/common"
 )
 

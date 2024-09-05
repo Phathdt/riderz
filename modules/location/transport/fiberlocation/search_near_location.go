@@ -3,13 +3,13 @@ package fiberlocation
 import (
 	"github.com/gofiber/fiber/v2"
 	sctx "github.com/phathdt/service-context"
+	"github.com/phathdt/service-context/component/validation"
 	"github.com/phathdt/service-context/core"
 	"net/http"
 	"riderz/modules/location/dto"
 	"riderz/modules/location/handlers"
 	locationRepo "riderz/modules/location/repository/sql"
 	"riderz/plugins/pgxc"
-	"riderz/plugins/validation"
 	"riderz/shared/common"
 )
 
