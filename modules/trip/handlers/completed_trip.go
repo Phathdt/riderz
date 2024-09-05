@@ -10,9 +10,8 @@ import (
 )
 
 type CompletedTripRepo interface {
-	CompleteTrip(ctx context.Context, arg tripRepo.CompleteTripParams) error
+	CompleteTripWithEvent(ctx context.Context, arg tripRepo.CompleteTripParams, eventArg tripRepo.CreateTripEventParams) error
 	GetTrip(ctx context.Context, tripCode string) (*tripRepo.Trip, error)
-	CreateTripEvent(ctx context.Context, arg tripRepo.CreateTripEventParams) (int64, error)
 }
 
 type completeTripHdl struct {
@@ -30,14 +29,12 @@ func (h *completeTripHdl) Response(ctx context.Context, tripCode string, data *d
 		return err
 	}
 
-	if err = h.repo.CompleteTrip(ctx, tripRepo.CompleteTripParams{
+	tripData := tripRepo.CompleteTripParams{
 		TripCode: tripCode,
 		Status:   domain.TripStatusCompleted,
-	}); err != nil {
-		return err
 	}
 
-	if _, err = h.repo.CreateTripEvent(ctx, tripRepo.CreateTripEventParams{
+	eventData := tripRepo.CreateTripEventParams{
 		TripID:    trip.ID,
 		TripCode:  trip.TripCode,
 		EventType: domain.TripEventTypeCompleted,
@@ -53,7 +50,9 @@ func (h *completeTripHdl) Response(ctx context.Context, tripCode string, data *d
 				TripDuration: 0,
 			},
 		},
-	}); err != nil {
+	}
+
+	if err = h.repo.CompleteTripWithEvent(ctx, tripData, eventData); err != nil {
 		return err
 	}
 

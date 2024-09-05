@@ -15,8 +15,7 @@ type AssignDriverLocationRepo interface {
 }
 
 type AssignDriverRepo interface {
-	AssignDriver(ctx context.Context, arg tripRepo.AssignDriverParams) error
-	CreateTripEvent(ctx context.Context, arg tripRepo.CreateTripEventParams) (int64, error)
+	AssignDriverWithEvent(ctx context.Context, arg tripRepo.AssignDriverParams, argEvent tripRepo.CreateTripEventParams) error
 }
 
 type assignDriverHdl struct {
@@ -42,16 +41,15 @@ func (h *assignDriverHdl) Response(ctx context.Context, payload *domain.TripRequ
 
 	driverID := locations[0].UserID
 
-	if err = h.repo.AssignDriver(ctx, tripRepo.AssignDriverParams{
+	tripData := tripRepo.AssignDriverParams{
 		TripCode: payload.TripCode,
 		DriverID: null.IntFrom(driverID),
 		Status:   domain.TripStatusDriverAssigned,
-	}); err != nil {
-		return err
 	}
 
 	estimatedTime := time.Now().Add(15 * time.Minute)
-	_, err = h.repo.CreateTripEvent(ctx, tripRepo.CreateTripEventParams{
+
+	eventData := tripRepo.CreateTripEventParams{
 		TripID:    payload.Data.TripID,
 		TripCode:  payload.TripCode,
 		EventType: domain.TripEventTypeDriverAssigned,
@@ -62,8 +60,9 @@ func (h *assignDriverHdl) Response(ctx context.Context, payload *domain.TripRequ
 				EstimatedPickupTime: estimatedTime,
 			},
 		},
-	})
-	if err != nil {
+	}
+
+	if err = h.repo.AssignDriverWithEvent(ctx, tripData, eventData); err != nil {
 		return err
 	}
 

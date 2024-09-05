@@ -12,8 +12,7 @@ import (
 
 type DriverArrivedRepo interface {
 	GetTrip(ctx context.Context, tripCode string) (*tripRepo.Trip, error)
-	UpdateTripStatus(ctx context.Context, arg tripRepo.UpdateTripStatusParams) error
-	CreateTripEvent(ctx context.Context, arg tripRepo.CreateTripEventParams) (int64, error)
+	UpdateTripStatusWithEvent(ctx context.Context, arg tripRepo.UpdateTripStatusParams, eventArg tripRepo.CreateTripEventParams) error
 }
 
 type driverArrivedHdl struct {
@@ -35,14 +34,12 @@ func (h *driverArrivedHdl) Response(ctx context.Context, tripCode string, data *
 		return err
 	}
 
-	if err = h.repo.UpdateTripStatus(ctx, tripRepo.UpdateTripStatusParams{
+	tripData := tripRepo.UpdateTripStatusParams{
 		TripCode: tripCode,
 		Status:   domain.TripStatusDriverArrived,
-	}); err != nil {
-		return err
 	}
 
-	if _, err = h.repo.CreateTripEvent(ctx, tripRepo.CreateTripEventParams{
+	eventData := tripRepo.CreateTripEventParams{
 		TripID:    trip.ID,
 		TripCode:  trip.TripCode,
 		EventType: domain.TripEventTypeDriverArrived,
@@ -53,7 +50,9 @@ func (h *driverArrivedHdl) Response(ctx context.Context, tripCode string, data *
 				Longitude: data.Long,
 			}},
 		},
-	}); err != nil {
+	}
+
+	if err = h.repo.UpdateTripStatusWithEvent(ctx, tripData, eventData); err != nil {
 		return err
 	}
 

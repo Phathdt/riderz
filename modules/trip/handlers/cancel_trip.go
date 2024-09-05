@@ -11,8 +11,7 @@ import (
 
 type CancelTripRepo interface {
 	GetTrip(ctx context.Context, tripCode string) (*tripRepo.Trip, error)
-	UpdateTripStatus(ctx context.Context, arg tripRepo.UpdateTripStatusParams) error
-	CreateTripEvent(ctx context.Context, arg tripRepo.CreateTripEventParams) (int64, error)
+	UpdateTripStatusWithEvent(ctx context.Context, arg tripRepo.UpdateTripStatusParams, eventArg tripRepo.CreateTripEventParams) error
 }
 
 type cancelTripHdl struct {
@@ -30,14 +29,12 @@ func (h *cancelTripHdl) Response(ctx context.Context, tripCode string, data *dto
 		return err
 	}
 
-	if err = h.repo.UpdateTripStatus(ctx, tripRepo.UpdateTripStatusParams{
+	updateData := tripRepo.UpdateTripStatusParams{
 		TripCode: tripCode,
 		Status:   domain.TripStatusCancelled,
-	}); err != nil {
-		return err
 	}
 
-	if _, err = h.repo.CreateTripEvent(ctx, tripRepo.CreateTripEventParams{
+	eventData := tripRepo.CreateTripEventParams{
 		TripID:    trip.ID,
 		TripCode:  trip.TripCode,
 		EventType: domain.TripEventTypeCancelled,
@@ -49,7 +46,9 @@ func (h *cancelTripHdl) Response(ctx context.Context, tripCode string, data *dto
 				CancellationTime:   time.Now(),
 			},
 		},
-	}); err != nil {
+	}
+
+	if err = h.repo.UpdateTripStatusWithEvent(ctx, updateData, eventData); err != nil {
 		return err
 	}
 
