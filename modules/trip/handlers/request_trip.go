@@ -13,8 +13,7 @@ import (
 )
 
 type RequestTripRepo interface {
-	CreateTrip(ctx context.Context, arg tripRepo.CreateTripParams) (int64, error)
-	CreateTripEvent(ctx context.Context, arg tripRepo.CreateTripEventParams) (int64, error)
+	CreateTripAndEvent(ctx context.Context, tripArg tripRepo.CreateTripParams, eventArg tripRepo.CreateTripEventParams) (tripID int64, err error)
 }
 
 type requestTripHdl struct {
@@ -29,7 +28,8 @@ func NewRequestTripHdl(producer kcomp.KProducer, repo RequestTripRepo) *requestT
 func (h *requestTripHdl) Response(ctx context.Context, data *dto.CreateTripData) (string, error) {
 	tripCode := h.generateIdempotent()
 
-	tripID, err := h.repo.CreateTrip(ctx, tripRepo.CreateTripParams{
+	now := time.Now()
+	createTripData := tripRepo.CreateTripParams{
 		TripCode:       tripCode,
 		UserID:         data.UserID,
 		Status:         domain.TripStatusRequested,
@@ -39,16 +39,12 @@ func (h *requestTripHdl) Response(ctx context.Context, data *dto.CreateTripData)
 		PickupLat:      data.PickupLat,
 		DropoffLong:    data.DropoffLon,
 		DropoffLat:     data.DropoffLat,
-	})
-	if err != nil {
-		return "", err
 	}
 
-	_, err = h.repo.CreateTripEvent(ctx, tripRepo.CreateTripEventParams{
-		TripID:    tripID,
+	createTripEventData := tripRepo.CreateTripEventParams{
 		TripCode:  tripCode,
 		EventType: domain.TripEventTypeRequested,
-		EventTime: time.Now(),
+		EventTime: now,
 		EventData: domain.TripEventData{
 			TripRequested: &domain.TripRequestedData{
 				UserID: data.UserID,
@@ -63,13 +59,17 @@ func (h *requestTripHdl) Response(ctx context.Context, data *dto.CreateTripData)
 					Address:   data.DropoffAddress,
 				},
 			},
-		},
-	})
+		}}
+
+	tripID, err := h.repo.CreateTripAndEvent(ctx, createTripData, createTripEventData)
+	if err != nil {
+		return "", err
+	}
 
 	message := domain.TripRequestedMessage{
 		EventType: string(domain.TripEventTypeRequested),
 		TripCode:  tripCode,
-		Timestamp: time.Now(),
+		Timestamp: now,
 		Data: struct {
 			TripID          int64           `json:"trip_id"`
 			UserID          int64           `json:"user_id"`
